@@ -370,7 +370,7 @@ class _ExpenseFormPageState extends State<ExpenseFormPage> {
         categoryModel?.categoryColor == null) {
       isSnackbarShown = true;
       context.showSb(
-          const SnackBar(content: Text("Category is empty")), isSnackbarShown);
+          const SnackBar(content: Text("Type is empty")), isSnackbarShown);
       return false;
     }
 
@@ -379,8 +379,7 @@ class _ExpenseFormPageState extends State<ExpenseFormPage> {
         subCategoryModel?.subCategoryColor == null) {
       isSnackbarShown = true;
       context.showSb(
-          const SnackBar(content: Text("Sub Category name is empty")),
-          isSnackbarShown);
+          const SnackBar(content: Text("Category is empty")), isSnackbarShown);
       return false;
     }
 

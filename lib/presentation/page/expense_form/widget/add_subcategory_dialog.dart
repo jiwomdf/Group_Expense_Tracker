@@ -28,7 +28,7 @@ class _AddSubCategoryDialogState extends State<AddSubCategoryDialog> {
     return BlocBuilder<SubcategoryBloc, SubcategoryState>(
       builder: (context, state) {
         if (state is SubcategoryUpdated) {
-          context.show("Sub Category Inserted");
+          context.show("Category Inserted");
           Navigator.of(context, rootNavigator: true).pop(_ddlValue);
         } else if (state is SubcategoryError) {
           context.show(state.message);
@@ -89,9 +89,9 @@ class _AddSubCategoryDialogState extends State<AddSubCategoryDialog> {
                   child: TextFormField(
                     keyboardType: TextInputType.text,
                     decoration: textFormFieldStyle(
-                        context: context, hintText: "Sub Category name.."),
+                        context: context, hintText: "Category name.."),
                     validator: (val) => (val?.isEmpty ?? true)
-                        ? 'Sub Category cannot be empty'
+                        ? 'Category cannot be empty'
                         : null,
                     onChanged: (val) {
                       setState(
