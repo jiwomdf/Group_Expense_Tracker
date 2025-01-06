@@ -11,7 +11,7 @@ import 'package:group_expense_tracker/util/ext/string_util.dart';
 import 'package:group_expense_tracker/util/style/app_snackbar_util.dart';
 
 class FilterWidget extends StatefulWidget {
-  static const String _defaultSubCategory = "All subCategory";
+  static const String _defaultSubCategory = "All Category";
   static const String _defaultSubCategoryId = "ALL_CATEGORY_ID";
 
   const FilterWidget({super.key});
