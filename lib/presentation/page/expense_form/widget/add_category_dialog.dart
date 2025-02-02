@@ -52,11 +52,19 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
               children: [
                 Padding(
                   padding: const EdgeInsets.only(top: 20, left: 10, right: 10),
-                  child: Text('Add Type',
-                      style: TextUtil(context).urbanist(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                      )),
+                  child: Column(
+                    children: [
+                      Text('Add Type',
+                          style: TextUtil(context).urbanist(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                          )),
+                      const Text(
+                          "(Type is the parent of categories. eg: Primary needs, Secondary needs)",
+                          style: TextStyle(fontSize: 12),
+                          textAlign: TextAlign.center),
+                    ],
+                  ),
                 ),
                 Padding(
                   padding: const EdgeInsets.only(top: 10, left: 10, right: 10),

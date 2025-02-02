@@ -52,11 +52,19 @@ class _AddSubCategoryDialogState extends State<AddSubCategoryDialog> {
               children: [
                 Padding(
                   padding: const EdgeInsets.only(top: 20, left: 10, right: 10),
-                  child: Text('Add Category',
-                      style: TextUtil(context).urbanist(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                      )),
+                  child: Column(
+                    children: [
+                      Text('Add Category',
+                          style: TextUtil(context).urbanist(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                          )),
+                      const Text(
+                          "(Category is the child of type. eg: Eat out, Grocery, Hobby, Entertainment)",
+                          style: TextStyle(fontSize: 12),
+                          textAlign: TextAlign.center),
+                    ],
+                  ),
                 ),
                 Padding(
                   padding: const EdgeInsets.only(top: 20, left: 10, right: 10),
