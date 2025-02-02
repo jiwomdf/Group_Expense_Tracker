@@ -1,5 +1,3 @@
-import 'dart:html' as universal_html;
-
 import 'package:core/domain/model/expense_category_model.dart';
 import 'package:excel/excel.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -13,6 +11,7 @@ import 'package:group_expense_tracker/util/ext/date_format_util.dart';
 import 'package:group_expense_tracker/util/ext/text_util.dart';
 import 'package:group_expense_tracker/util/style/app_assets_util.dart';
 import 'package:group_expense_tracker/util/style/app_snackbar_util.dart';
+import 'package:universal_html/html.dart' as universal_html;
 
 class ExportExpenseSheetPage extends StatefulWidget {
   static const routeName = '/export-expense-sheet-page';

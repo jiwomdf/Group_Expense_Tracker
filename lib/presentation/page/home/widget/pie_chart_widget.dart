@@ -76,14 +76,19 @@ class _PieChartWidgetState extends State<PieChartWidget> {
     var sortExpenseList =
         listExpense.sortedBy((it) => it.categoryName).toList();
 
+//TODO JIWO
+    for (var action in sortExpenseList) {
+      debugPrint(action.categoryName);
+    }
+
     var tempCategory = "";
     for (var i = 0; i < sortExpenseList.length; i++) {
       var data = sortExpenseList[i];
 
       if (tempCategory != data.categoryName) {
         var tempTotalCategory = 0;
-        var tempList = sortExpenseList
-            .where((it) => it.subCategoryName == data.subCategoryName);
+        var tempList =
+            sortExpenseList.where((it) => it.categoryName == data.categoryName);
 
         for (var item in tempList) {
           tempTotalCategory += item.price;
