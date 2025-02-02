@@ -1,3 +1,4 @@
+import 'package:core/repository/app_setting_repository.dart';
 import 'package:core/repository/auth_repository.dart';
 import 'package:core/repository/fcm_repository.dart';
 import 'package:core/repository/firestore_repository.dart';
@@ -16,4 +17,6 @@ Future<void> init() async {
       FcmRepository(client: locator()));
   PoultryRegistry.safeRegisterSingleton<HolidayRepository>(
       HolidayRepository(locator()));
+  PoultryRegistry.safeRegisterSingleton<AppSettingRepository>(
+      AppSettingRepository(locator()));
 }

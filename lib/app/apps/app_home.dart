@@ -11,6 +11,7 @@ import 'package:group_expense_tracker/generated/l10n.dart';
 import 'package:group_expense_tracker/presentation/bloc/category/category_bloc.dart';
 import 'package:group_expense_tracker/presentation/bloc/expense/expense_bloc.dart';
 import 'package:group_expense_tracker/presentation/bloc/fcm/fcm_bloc.dart';
+import 'package:group_expense_tracker/presentation/bloc/income/income_cubit.dart';
 import 'package:group_expense_tracker/presentation/bloc/logout/logout_bloc.dart';
 import 'package:group_expense_tracker/presentation/bloc/subcategory/subcategory_bloc.dart';
 import 'package:group_expense_tracker/presentation/bloc/usermodel/userdatamodel_bloc.dart';
@@ -52,6 +53,7 @@ class AppHomeState extends State<AppHome> {
             BlocProvider(create: (_) => di.locator<SubcategoryBloc>()),
             BlocProvider(create: (_) => di.locator<FcmBloc>()),
             BlocProvider(create: (_) => di.locator<LogoutBloc>()),
+            BlocProvider(create: (_) => di.locator<IncomeCubit>()),
           ],
           child: initMaterialApp(_themeMode),
         ));

@@ -6,8 +6,7 @@ import 'package:group_expense_tracker/presentation/bloc/usermodel/userdatamodel_
 import 'package:group_expense_tracker/presentation/page/export_expense/export_expense_page.dart';
 import 'package:group_expense_tracker/presentation/page/holiday/holiday_page.dart';
 import 'package:group_expense_tracker/presentation/page/home/widget/profile_widget.dart';
-import 'package:group_expense_tracker/presentation/page/import_expense/import_expense_page.dart';
-import 'package:group_expense_tracker/presentation/page/update_table/update_table_page.dart';
+import 'package:group_expense_tracker/presentation/page/income/UpdateIncomePage.dart';
 import 'package:group_expense_tracker/util/ext/text_util.dart';
 import 'package:group_expense_tracker/util/style/app_color_util.dart';
 import 'package:group_expense_tracker/util/version_util.dart';
@@ -60,6 +59,7 @@ class _RightDrawerState extends State<RightDrawer> {
                     children: [
                       _heading("Features"),
                       _holiday(context),
+                      _updateIncome(context),
                       _heading("Data Management"),
                       _exportData(context),
                       _heading("Setting Firebase"),
@@ -129,7 +129,7 @@ class _RightDrawerState extends State<RightDrawer> {
       padding: const EdgeInsets.only(bottom: 10, top: 10, left: 10),
       child: InkWell(
         onTap: () {
-          Navigator.pushNamed(context, ImportExpensePage.routeName);
+          /** Navigator.pushNamed(context, ImportExpensePage.routeName); **/
         },
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -232,7 +232,7 @@ class _RightDrawerState extends State<RightDrawer> {
       padding: const EdgeInsets.only(bottom: 10, top: 10, left: 10),
       child: InkWell(
         onTap: () {
-          Navigator.pushNamed(context, UpdateTablePage.routeName);
+          /** Navigator.pushNamed(context, UpdateTablePage.routeName); **/
         },
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -291,6 +291,29 @@ class _RightDrawerState extends State<RightDrawer> {
         ),
       ),
     );
+  }
+
+  _updateIncome(BuildContext context) {
+    return Padding(
+        padding: const EdgeInsets.only(bottom: 10, top: 10, left: 10),
+        child: InkWell(
+            onTap: () {
+              Navigator.pushNamed(context, UpdateIncomePage.routeName);
+            },
+            child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.only(right: 4),
+                      child: Icon(Icons.money),
+                    ),
+                    Text("Update Income",
+                        style: TextUtil(context).urbanist(
+                            fontSize: 16, fontWeight: FontWeight.w600)),
+                  ],
+                ))));
   }
 
   Widget _heading(String s) {
