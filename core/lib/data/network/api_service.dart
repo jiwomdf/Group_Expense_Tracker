@@ -39,7 +39,7 @@ class ApiService {
     } */
   }
 
-  /** _onError(DioException e, ErrorInterceptorHandler handler) async {
+  /* _onError(DioException e, ErrorInterceptorHandler handler) async {
     if (e.response?.statusCode == 423 && _appPref.isUserLogged()) {
       _logout();
       handler.reject(e);
@@ -48,7 +48,7 @@ class ApiService {
     } else {
       handler.next(e);
     }
-  }**/
+  }*/
 
   Future<Response> get(
       {required String endPoint, dynamic data, dynamic params}) async {

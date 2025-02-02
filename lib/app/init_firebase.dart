@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_null_comparison
+
 import 'package:core/data/pref/firebase_options_pref.dart';
 import 'package:core/domain/model/firebase_options_android_model.dart';
 import 'package:core/domain/model/firebase_options_ios_model.dart';
