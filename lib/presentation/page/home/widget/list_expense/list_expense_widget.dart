@@ -56,7 +56,7 @@ class _ListExpenseWidgetState extends State<ListExpenseWidget> {
               ExpenseFormPage.routeName,
               arguments: expenseCategoryModel,
             ).then((completion) {
-              if (context.mounted) {
+              if (mounted) {
                 if (completion != null) {
                   context.show(expenseCategoryModel.note +
                       S

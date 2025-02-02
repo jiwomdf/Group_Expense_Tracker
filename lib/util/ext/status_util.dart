@@ -1,4 +1,4 @@
 class StatusUtil {
-  static var INSERTED = "I";
-  static var UPDATED = "U";
+  static const inserted = "I";
+  static const updated = "U";
 }

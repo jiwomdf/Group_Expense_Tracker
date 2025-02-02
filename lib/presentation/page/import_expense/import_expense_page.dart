@@ -162,7 +162,7 @@ class _ImportExpensePageState extends State<ImportExpensePage> {
   Future<void> importData() async {
     var listBatchExpense = await parseJsonFromAssets("assets/import/data.json");
 
-    if (context.mounted) {
+    if (mounted) {
       context
           .read<ExpenseBloc>()
           .add(InsertBatchExpenseEvent(listBatchExpense));

@@ -412,7 +412,7 @@ class _ExpenseFormPageState extends State<ExpenseFormPage> {
               month: insertedMonth,
               dayOfMonth: insertedDayOfMonth,
               timeStamp: timeStamp,
-              status: StatusUtil.UPDATED,
+              status: StatusUtil.updated,
             )));
       } else {
         context.read<ExpenseBloc>().add(InsertExpenseEvent(InsertExpenseRequest(
@@ -425,7 +425,7 @@ class _ExpenseFormPageState extends State<ExpenseFormPage> {
               month: insertedMonth,
               dayOfMonth: insertedDayOfMonth,
               timeStamp: timeStamp,
-              status: StatusUtil.INSERTED,
+              status: StatusUtil.inserted,
             )));
       }
 

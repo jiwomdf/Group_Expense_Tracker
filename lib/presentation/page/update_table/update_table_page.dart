@@ -93,7 +93,7 @@ class _UpdateTablePageState extends State<UpdateTablePage> {
           UpdateExpenseScheme.updateExpenseSchemeCollection(action);
       newListOfExpense.add(updateData);
     }
-    if (context.mounted) {
+    if (mounted) {
       context
           .read<ExpenseBloc>()
           .add(UpdateBatchExpenseEvent(newListOfExpense));
