@@ -42,8 +42,6 @@ class AuthPref {
       bool result = await prefs.setBool(userPref, isDarkMode);
       return Right(result);
     } catch (e) {
-      //TODO JIWO
-      print("eee + ${e.toString()}");
       return Left(GeneralFailure(e.toString()));
     }
   }

@@ -2,7 +2,6 @@ import 'package:core/domain/model/sub_category_model.dart';
 import 'package:core/util/color_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:group_expense_tracker/presentation/bloc/expense/expense_bloc.dart';
 import 'package:group_expense_tracker/presentation/bloc/subcategory/subcategory_bloc.dart';
 import 'package:group_expense_tracker/presentation/widget/devider.dart';
 import 'package:group_expense_tracker/util/ext/date_util.dart';
@@ -14,7 +13,15 @@ class FilterWidget extends StatefulWidget {
   static const String _defaultSubCategory = "All Category";
   static const String _defaultSubCategoryId = "ALL_CATEGORY_ID";
 
-  const FilterWidget({super.key});
+  final int ddlMonth;
+  final int ddlYear;
+  final Function onDdlChanged;
+
+  const FilterWidget(
+      {super.key,
+      required this.ddlMonth,
+      required this.ddlYear,
+      required this.onDdlChanged});
 
   @override
   State<FilterWidget> createState() => _FilterWidgetState();
@@ -24,6 +31,7 @@ class _FilterWidgetState extends State<FilterWidget> {
   String _ddlMonthStrValue = '';
   int _ddlMonthValue = 1;
   int _ddlYearValue = DateTime.now().year;
+
   final SubCategoryModel _ddlSubCategoryValue = SubCategoryModel(
     subCategoryId: FilterWidget._defaultSubCategoryId,
     subCategoryColor: 0xff443a49,
@@ -36,9 +44,17 @@ class _FilterWidgetState extends State<FilterWidget> {
   @override
   void initState() {
     super.initState();
-    _listYear = generateLastFiveYear();
 
+    _listYear = generateLastFiveYear();
     var month = DateTime.now().month;
+
+    if (widget.ddlMonth != 0) {
+      _ddlMonthValue = widget.ddlMonth;
+      _ddlMonthStrValue = ddMonths[month - 1].keys.first;
+      _ddlYearValue = widget.ddlYear;
+      return;
+    }
+
     _ddlMonthStrValue = ddMonths[month - 1].keys.first;
     _ddlMonthValue = month;
   }
@@ -80,10 +96,10 @@ class _FilterWidgetState extends State<FilterWidget> {
             _ddlMonthValue = monthVal;
           });
           _updateExpenseList(
-            monthVal,
-            _ddlYearValue,
-            _ddlSubCategoryValue.subCategoryName,
-          );
+              monthVal,
+              _ddlYearValue,
+              _ddlSubCategoryValue.subCategoryName,
+              _ddlSubCategoryValue.subCategoryId);
         },
       ),
     );
@@ -109,6 +125,7 @@ class _FilterWidgetState extends State<FilterWidget> {
             _ddlMonthValue,
             _ddlYearValue,
             _ddlSubCategoryValue.subCategoryName,
+            _ddlSubCategoryValue.subCategoryId,
           );
         },
       ),
@@ -164,25 +181,28 @@ class _FilterWidgetState extends State<FilterWidget> {
                   value?.subCategoryColor ?? subCategoryDefaultColor;
               _ddlSubCategoryValue.subCategoryName =
                   value?.subCategoryName ?? "";
+              _ddlSubCategoryValue.subCategoryId = value?.subCategoryId ?? "";
             });
             _updateExpenseList(
-              _ddlMonthValue,
-              _ddlYearValue,
-              _ddlSubCategoryValue.subCategoryName,
-            );
+                _ddlMonthValue,
+                _ddlYearValue,
+                _ddlSubCategoryValue.subCategoryName,
+                _ddlSubCategoryValue.subCategoryId);
           },
         );
       },
     );
   }
 
-  void _updateExpenseList(int month, int year, String subCategory) {
+  void _updateExpenseList(
+      int month, int year, String subCategory, String subCategoryId) {
     var selectedSubCategory = "";
+    var selectedSubCategoryId = "";
     if (FilterWidget._defaultSubCategory != subCategory) {
       selectedSubCategory = subCategory;
+      selectedSubCategoryId = subCategoryId;
     }
-    context
-        .read<ExpenseBloc>()
-        .add(GetExpenseEvent(month, year, selectedSubCategory));
+    widget.onDdlChanged(
+        month, year, selectedSubCategory, selectedSubCategoryId);
   }
 }

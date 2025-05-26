@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:group_expense_tracker/app/apps/app_home.dart';
+import 'package:group_expense_tracker/di/bloc_injection.dart' as di;
 import 'package:group_expense_tracker/generated/l10n.dart';
 import 'package:group_expense_tracker/presentation/bloc/expense/expense_bloc.dart';
 import 'package:group_expense_tracker/presentation/bloc/subcategory/subcategory_bloc.dart';
@@ -24,12 +25,13 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  int ddlMonth = DateTime.now().month;
+  int ddlYear = DateTime.now().year;
+
   @override
   void initState() {
     super.initState();
 
-    context.read<SubcategoryBloc>().add(const GetSubcategoryWithCacheEvent());
-    context.read<ExpenseBloc>().add(const ResetExpenseEvent());
     if (mounted) {
       final appHome = AppHome.of(context);
       final isDarkMode = appHome.getIsDarkMode();
@@ -41,68 +43,95 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: Toolbar(title: S.of(context).home, showDrawer: true),
-      endDrawer: const RightDrawer(),
-      body: const SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Padding(
-                padding:
-                    EdgeInsets.only(top: 12, left: 16, right: 16, bottom: 12),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+            create: (_) => di.locator<SubcategoryBloc>()
+              ..add(const GetSubcategoryWithCacheEvent())),
+        BlocProvider(
+            create: (_) => di.locator<ExpenseBloc>()
+              ..add(GetExpenseEvent(
+                  DateTime.now().month, DateTime.now().year, ""))),
+      ],
+      child: BlocBuilder<ExpenseBloc, ExpenseState>(
+        builder: (context, state) {
+          return Scaffold(
+            appBar: Toolbar(title: S.of(context).home, showDrawer: true),
+            endDrawer: const RightDrawer(),
+            body: SafeArea(
+              child: SingleChildScrollView(
+                child: Column(
                   children: [
-                    PieChartSubCategoryWidget(),
-                    PieChartWidget(),
+                    const Padding(
+                      padding: EdgeInsets.only(
+                          top: 12, left: 16, right: 16, bottom: 12),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          PieChartSubCategoryWidget(),
+                          PieChartWidget(),
+                        ],
+                      ),
+                    ),
+                    const Padding(
+                        padding: EdgeInsets.only(top: 8, left: 16, right: 16),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            CardExpenseWidget(),
+                            CardIncomeWidget(),
+                          ],
+                        )),
+                    Padding(
+                      padding:
+                          const EdgeInsets.only(top: 15, left: 16, right: 16),
+                      child: Column(
+                        children: [
+                          FilterWidget(
+                            ddlMonth: ddlMonth,
+                            ddlYear: ddlYear,
+                            onDdlChanged: (month, year, ddlSubCategory,
+                                ddlSubCategoryId) {
+                              context.read<ExpenseBloc>().add(GetExpenseEvent(
+                                  month, year, ddlSubCategoryId));
+                              setState(() {
+                                ddlMonth = month;
+                                ddlYear = year;
+                                ddlSubCategory = ddlSubCategory;
+                              });
+                            },
+                          ),
+                          const ExpenseWidget(),
+                        ],
+                      ),
+                    )
                   ],
                 ),
               ),
-              Padding(
-                  padding: EdgeInsets.only(top: 8, left: 16, right: 16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      CardExpenseWidget(),
-                      CardIncomeWidget(),
-                    ],
-                  )),
-              Padding(
-                padding: EdgeInsets.only(top: 15, left: 16, right: 16),
-                child: Column(
-                  children: [
-                    FilterWidget(),
-                    ExpenseWidget(),
-                  ],
+            ),
+            floatingActionButton: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                FloatingActionButton(
+                  heroTag: "fab_insert",
+                  shape: const CircleBorder(),
+                  onPressed: () {
+                    Navigator.pushNamed(context, ExpenseFormPage.routeName);
+                  },
+                  child: const Icon(Icons.add),
                 ),
-              )
-            ],
-          ),
-        ),
-      ),
-      floatingActionButton: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          FloatingActionButton(
-            heroTag: "fab_insert",
-            shape: const CircleBorder(),
-            onPressed: () {
-              Navigator.pushNamed(context, ExpenseFormPage.routeName);
-            },
-            child: const Icon(Icons.add),
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-        ],
+                const SizedBox(
+                  height: 10,
+                ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
 
   void _setTheme(AppHomeState appHome, bool value) {
-    //TODO JIWO
-    print("value: $value");
     if (value) {
       appHome.changeTheme(ThemeMode.light);
     } else {

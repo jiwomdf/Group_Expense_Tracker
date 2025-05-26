@@ -6,6 +6,7 @@ import 'package:core/domain/model/sub_category_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:group_expense_tracker/di/bloc_injection.dart' as di;
 import 'package:group_expense_tracker/presentation/bloc/category/category_bloc.dart';
 import 'package:group_expense_tracker/presentation/bloc/expense/expense_bloc.dart';
 import 'package:group_expense_tracker/presentation/bloc/fcm/fcm_bloc.dart';
@@ -75,68 +76,77 @@ class _ExpenseFormPageState extends State<ExpenseFormPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Form"),
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      ),
-      body: SafeArea(
-        child: MultiBlocListener(
-          listeners: [
-            BlocListener<ExpenseBloc, ExpenseState>(
-              listener: (context, state) {
-                if (state is ExpenseDataChanged) {
-                  Navigator.pop(context, state.isSuccess);
-                  /* TODO(JIWO), fcm call
-                   context.read<FcmBloc>().add(
-                        PostFcmEvent(SendFcmRequest(
-                            to: "/topics/all",
-                            notification: FcmNotification(
-                              title:
-                                  "$note - Rp. ${price.fromRupiah().toRupiah()}",
-                              body: "$date - ${categoryModel?.categoryName}",
-                            ))),
-                      ); */
-                } else if (state is ExpenseError) {
-                  context.show(state.message);
-                }
-              },
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_) => di.locator<ExpenseBloc>()),
+      ],
+      child: BlocBuilder<ExpenseBloc, ExpenseState>(
+        builder: (context, state) {
+          return Scaffold(
+            appBar: AppBar(
+              title: const Text("Form"),
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
             ),
-            BlocListener<FcmBloc, FcmState>(
-              listener: (context, state) {
-                if (state is FcmHasData) {
-                  Navigator.pop(context, true);
-                } else if (state is FcmError) {
-                  context.show(state.message);
-                }
-              },
-            ),
-          ],
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: SingleChildScrollView(
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        addNote(),
-                        addDate(context),
-                        addType(context),
-                        addCategory(context),
-                        addPrice(),
-                      ],
+            body: SafeArea(
+              child: MultiBlocListener(
+                listeners: [
+                  BlocListener<ExpenseBloc, ExpenseState>(
+                    listener: (context, state) {
+                      if (state is ExpenseDataChanged) {
+                        Navigator.pop(context, state.isSuccess);
+                        /* TODO(JIWO), fcm call
+                             context.read<FcmBloc>().add(
+                                  PostFcmEvent(SendFcmRequest(
+                                      to: "/topics/all",
+                                      notification: FcmNotification(
+                                        title:
+                                            "$note - Rp. ${price.fromRupiah().toRupiah()}",
+                                        body: "$date - ${categoryModel?.categoryName}",
+                                      ))),
+                                ); */
+                      } else if (state is ExpenseError) {
+                        context.show(state.message);
+                      }
+                    },
+                  ),
+                  BlocListener<FcmBloc, FcmState>(
+                    listener: (context, state) {
+                      if (state is FcmHasData) {
+                        Navigator.pop(context, true);
+                      } else if (state is FcmError) {
+                        context.show(state.message);
+                      }
+                    },
+                  ),
+                ],
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: SingleChildScrollView(
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              addNote(),
+                              addDate(context),
+                              addType(context),
+                              addCategory(context),
+                              addPrice(),
+                            ],
+                          ),
+                          actionButton(context)
+                        ],
+                      ),
                     ),
-                    actionButton(context)
-                  ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }
@@ -152,7 +162,7 @@ class _ExpenseFormPageState extends State<ExpenseFormPage> {
               width: MediaQuery.of(context).size.width,
               child: OutlinedButton(
                 onPressed: () {
-                  submitForm();
+                  submitForm(context);
                 },
                 child: Text(isFromEdit ? "Update expense" : "Add expense"),
               ),
@@ -362,7 +372,7 @@ class _ExpenseFormPageState extends State<ExpenseFormPage> {
     });
   }
 
-  bool submitForm() {
+  bool submitForm(BuildContext context) {
     isSnackbarShown = false;
 
     if (categoryModel?.categoryId.isEmpty == true ||

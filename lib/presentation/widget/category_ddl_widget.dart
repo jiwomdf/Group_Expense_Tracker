@@ -1,6 +1,7 @@
 import 'package:core/domain/model/category_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:group_expense_tracker/di/bloc_injection.dart' as di;
 import 'package:group_expense_tracker/presentation/bloc/category/category_bloc.dart';
 import 'package:group_expense_tracker/util/ext/int_util.dart';
 import 'package:group_expense_tracker/util/ext/string_util.dart';
@@ -30,8 +31,6 @@ class _CategoryDdlWidgetState extends State<CategoryDdlWidget> {
 
   @override
   void initState() {
-    context.read<CategoryBloc>().add(const GetCategoryEvent());
-
     _ddlValue = widget.initialData ??
         CategoryModel(
           categoryId: "",
@@ -43,49 +42,53 @@ class _CategoryDdlWidgetState extends State<CategoryDdlWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<CategoryBloc, CategoryState>(
-      builder: (context, state) {
-        if (state is CategoryHasData) {
-          _categories = state.result;
-        } else if (state is CategoryError) {
-          context.show(state.message);
-        }
+    return BlocProvider(
+      create: (context) =>
+          di.locator<CategoryBloc>()..add(const GetCategoryEvent()),
+      child: BlocBuilder<CategoryBloc, CategoryState>(
+        builder: (context, state) {
+          if (state is CategoryHasData) {
+            _categories = state.result;
+          } else if (state is CategoryError) {
+            context.show(state.message);
+          }
 
-        return DropdownButton(
-          hint: Row(
-            children: [
-              SizedBox(
-                height: 15,
-                child: CircleAvatar(
-                    backgroundColor: _ddlValue.categoryColor.toColor()),
-              ),
-              Text((_ddlValue.categoryName).ifEmpty("Choose one")),
-            ],
-          ),
-          items: _categories.map((CategoryModel value) {
-            return DropdownMenuItem(
-                value: value,
-                child: Row(
-                  children: [
-                    SizedBox(
-                      height: 15,
-                      child: CircleAvatar(
-                          backgroundColor: value.categoryColor.toColor()),
-                    ),
-                    Text(value.categoryName),
-                  ],
-                ));
-          }).toList(),
-          onChanged: (value) {
-            setState(() {
-              _ddlValue.categoryId = value?.categoryId ?? "";
-              _ddlValue.categoryName = value?.categoryName ?? "";
-              _ddlValue.categoryColor = value?.categoryColor ?? 0;
-            });
-            widget.selectedCategory(_ddlValue);
-          },
-        );
-      },
+          return DropdownButton(
+            hint: Row(
+              children: [
+                SizedBox(
+                  height: 15,
+                  child: CircleAvatar(
+                      backgroundColor: _ddlValue.categoryColor.toColor()),
+                ),
+                Text((_ddlValue.categoryName).ifEmpty("Choose one")),
+              ],
+            ),
+            items: _categories.map((CategoryModel value) {
+              return DropdownMenuItem(
+                  value: value,
+                  child: Row(
+                    children: [
+                      SizedBox(
+                        height: 15,
+                        child: CircleAvatar(
+                            backgroundColor: value.categoryColor.toColor()),
+                      ),
+                      Text(value.categoryName),
+                    ],
+                  ));
+            }).toList(),
+            onChanged: (value) {
+              setState(() {
+                _ddlValue.categoryId = value?.categoryId ?? "";
+                _ddlValue.categoryName = value?.categoryName ?? "";
+                _ddlValue.categoryColor = value?.categoryColor ?? 0;
+              });
+              widget.selectedCategory(_ddlValue);
+            },
+          );
+        },
+      ),
     );
   }
 }

@@ -19,10 +19,12 @@ Future<void> init() async {
   PoultryRegistry.safeRegisterSingleton<LogoutBloc>(LogoutBloc(locator()));
   PoultryRegistry.safeRegisterSingleton<UserDataModelBloc>(
       UserDataModelBloc(locator()));
-  PoultryRegistry.safeRegisterSingleton<ExpenseBloc>(ExpenseBloc(locator()));
-  PoultryRegistry.safeRegisterSingleton<CategoryBloc>(CategoryBloc(locator()));
-  PoultryRegistry.safeRegisterSingleton<SubcategoryBloc>(
-      SubcategoryBloc(locator()));
+  PoultryRegistry.safeRegisterFactory<ExpenseBloc>(
+      () => ExpenseBloc(locator()));
+  PoultryRegistry.safeRegisterFactory<CategoryBloc>(
+      () => CategoryBloc(locator()));
+  PoultryRegistry.safeRegisterFactory<SubcategoryBloc>(
+      () => SubcategoryBloc(locator()));
   PoultryRegistry.safeRegisterSingleton<FcmBloc>(FcmBloc(locator()));
   PoultryRegistry.safeRegisterFactory<HolidayBloc>(
       () => HolidayBloc(locator()));

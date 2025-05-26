@@ -1,6 +1,7 @@
 import 'package:core/domain/model/sub_category_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:group_expense_tracker/di/bloc_injection.dart' as di;
 import 'package:group_expense_tracker/presentation/bloc/subcategory/subcategory_bloc.dart';
 import 'package:group_expense_tracker/util/ext/int_util.dart';
 import 'package:group_expense_tracker/util/ext/string_util.dart';
@@ -30,7 +31,6 @@ class _SubCategoryDdlWidgetState extends State<SubCategoryDdlWidget> {
 
   @override
   void initState() {
-    context.read<SubcategoryBloc>().add(const GetSubcategoryEvent());
     _ddlValue = widget._initialData ??
         SubCategoryModel(
           subCategoryId: "",
@@ -42,50 +42,54 @@ class _SubCategoryDdlWidgetState extends State<SubCategoryDdlWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<SubcategoryBloc, SubcategoryState>(
-      builder: (context, state) {
-        if (state is SubcategoryHasData) {
-          _subcategories = state.result;
-        } else if (state is SubcategoryError) {
-          context.show(state.message);
-        }
+    return BlocProvider(
+      create: (context) =>
+          di.locator<SubcategoryBloc>()..add(const GetSubcategoryEvent()),
+      child: BlocBuilder<SubcategoryBloc, SubcategoryState>(
+        builder: (context, state) {
+          if (state is SubcategoryHasData) {
+            _subcategories = state.result;
+          } else if (state is SubcategoryError) {
+            context.show(state.message);
+          }
 
-        return DropdownButton(
-          hint: Row(
-            children: [
-              SizedBox(
-                height: 15,
-                child: CircleAvatar(
-                    backgroundColor: _ddlValue.subCategoryColor.toColor()),
-              ),
-              Text((_ddlValue.subCategoryName).ifEmpty("Choose one")),
-            ],
-          ),
-          items: _subcategories.map((SubCategoryModel value) {
-            return DropdownMenuItem(
-                value: value,
-                child: Row(
-                  children: [
-                    SizedBox(
-                      height: 15,
-                      child: CircleAvatar(
-                          backgroundColor: value.subCategoryColor.toColor()),
-                    ),
-                    Text(value.subCategoryName,
-                        overflow: TextOverflow.ellipsis),
-                  ],
-                ));
-          }).toList(),
-          onChanged: (value) {
-            setState(() {
-              _ddlValue.subCategoryId = value?.subCategoryId ?? "";
-              _ddlValue.subCategoryName = value?.subCategoryName ?? "";
-              _ddlValue.subCategoryColor = value?.subCategoryColor ?? 0;
-            });
-            widget.selectedCategory(_ddlValue);
-          },
-        );
-      },
+          return DropdownButton(
+            hint: Row(
+              children: [
+                SizedBox(
+                  height: 15,
+                  child: CircleAvatar(
+                      backgroundColor: _ddlValue.subCategoryColor.toColor()),
+                ),
+                Text((_ddlValue.subCategoryName).ifEmpty("Choose one")),
+              ],
+            ),
+            items: _subcategories.map((SubCategoryModel value) {
+              return DropdownMenuItem(
+                  value: value,
+                  child: Row(
+                    children: [
+                      SizedBox(
+                        height: 15,
+                        child: CircleAvatar(
+                            backgroundColor: value.subCategoryColor.toColor()),
+                      ),
+                      Text(value.subCategoryName,
+                          overflow: TextOverflow.ellipsis),
+                    ],
+                  ));
+            }).toList(),
+            onChanged: (value) {
+              setState(() {
+                _ddlValue.subCategoryId = value?.subCategoryId ?? "";
+                _ddlValue.subCategoryName = value?.subCategoryName ?? "";
+                _ddlValue.subCategoryColor = value?.subCategoryColor ?? 0;
+              });
+              widget.selectedCategory(_ddlValue);
+            },
+          );
+        },
+      ),
     );
   }
 }

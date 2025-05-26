@@ -3,13 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:group_expense_tracker/app/apps/app_home.dart';
 import 'package:group_expense_tracker/presentation/bloc/logout/logout_bloc.dart';
 import 'package:group_expense_tracker/presentation/bloc/usermodel/userdatamodel_bloc.dart';
-import 'package:group_expense_tracker/presentation/page/export_expense/export_expense_page.dart';
 import 'package:group_expense_tracker/presentation/page/holiday/holiday_page.dart';
 import 'package:group_expense_tracker/presentation/page/home/widget/profile_widget.dart';
-import 'package:group_expense_tracker/presentation/page/import_expense/import_expense_page.dart';
-import 'package:group_expense_tracker/presentation/page/update_table/update_table_page.dart';
 import 'package:group_expense_tracker/util/ext/text_util.dart';
 import 'package:group_expense_tracker/util/style/app_color_util.dart';
+import 'package:group_expense_tracker/util/style/app_snackbar_util.dart';
 import 'package:group_expense_tracker/util/version_util.dart';
 
 class RightDrawer extends StatefulWidget {
@@ -137,7 +135,8 @@ class _RightDrawerState extends State<RightDrawer> {
       padding: const EdgeInsets.only(bottom: 10, top: 10, left: 10),
       child: InkWell(
         onTap: () {
-          Navigator.pushNamed(context, ImportExpensePage.routeName);
+          context.show("Currently feature not available");
+          /**Navigator.pushNamed(context, ImportExpensePage.routeName);**/
         },
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -163,7 +162,8 @@ class _RightDrawerState extends State<RightDrawer> {
       padding: const EdgeInsets.only(bottom: 10, top: 10, left: 10),
       child: InkWell(
         onTap: () {
-          Navigator.pushNamed(context, ExportExpensePage.routeName);
+          context.show("Currently feature not available");
+          /**Navigator.pushNamed(context, ExportExpensePage.routeName);**/
         },
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -233,7 +233,8 @@ class _RightDrawerState extends State<RightDrawer> {
       padding: const EdgeInsets.only(bottom: 10, top: 10, left: 10),
       child: InkWell(
         onTap: () {
-          Navigator.pushNamed(context, UpdateTablePage.routeName);
+          context.show("Currently feature not available");
+          /**Navigator.pushNamed(context, UpdateTablePage.routeName);**/
         },
         child: Padding(
           padding: const EdgeInsets.all(8.0),

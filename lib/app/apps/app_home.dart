@@ -8,11 +8,8 @@ import 'package:get_it/get_it.dart';
 import 'package:group_expense_tracker/app/app_theme.dart';
 import 'package:group_expense_tracker/di/bloc_injection.dart' as di;
 import 'package:group_expense_tracker/generated/l10n.dart';
-import 'package:group_expense_tracker/presentation/bloc/category/category_bloc.dart';
-import 'package:group_expense_tracker/presentation/bloc/expense/expense_bloc.dart';
 import 'package:group_expense_tracker/presentation/bloc/fcm/fcm_bloc.dart';
 import 'package:group_expense_tracker/presentation/bloc/logout/logout_bloc.dart';
-import 'package:group_expense_tracker/presentation/bloc/subcategory/subcategory_bloc.dart';
 import 'package:group_expense_tracker/presentation/bloc/usermodel/userdatamodel_bloc.dart';
 import 'package:group_expense_tracker/presentation/page/auth_wrapper.dart';
 import 'package:group_expense_tracker/router.dart';
@@ -47,9 +44,6 @@ class AppHomeState extends State<AppHome> {
         child: MultiProvider(
           providers: [
             BlocProvider(create: (_) => di.locator<UserDataModelBloc>()),
-            BlocProvider(create: (_) => di.locator<ExpenseBloc>()),
-            BlocProvider(create: (_) => di.locator<CategoryBloc>()),
-            BlocProvider(create: (_) => di.locator<SubcategoryBloc>()),
             BlocProvider(create: (_) => di.locator<FcmBloc>()),
             BlocProvider(create: (_) => di.locator<LogoutBloc>()),
           ],

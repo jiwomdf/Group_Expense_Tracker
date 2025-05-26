@@ -31,21 +31,25 @@ class InsertExpenseRequest {
 
   factory InsertExpenseRequest.fromJson(Map<String, dynamic> json) =>
       InsertExpenseRequest(
-        email: (json["email"] ?? "").toString().toInputFormat(),
-        note: (json["note"] ?? "").toString().toInputFormat(),
-        price: int.parse(json["price"] ?? 0),
-        date: (json["date"] ??
+        email: (json[ExpenseConstants.email] ?? "").toString().toInputFormat(),
+        note: (json[ExpenseConstants.note] ?? "").toString().toInputFormat(),
+        price: int.parse(json[ExpenseConstants.price] ?? 0),
+        date: (json[ExpenseConstants.date] ??
                 DateTime.now().toDateString(DateFormatUtil.ddMMMyyyy) ??
                 "")
             .toString()
             .toInputFormat(),
-        categoryId: (json["categoryId"] ?? "").toString(),
-        subCategoryId: (json["subCategoryId"] ?? "").toString(),
-        year: (json["year"] ?? "").toString().toInputFormat(),
-        month: (json["month"] ?? "").toString().toInputFormat(),
-        dayOfMonth: (json["dayOfMonth"] ?? "").toString().toInputFormat(),
-        timeStamp: (json["timeStamp"] ?? "").toString().toInputFormat(),
-        status: (json["status"] ?? "").toString().toInputFormat(),
+        categoryId: (json[ExpenseConstants.categoryId] ?? "").toString(),
+        subCategoryId: (json[ExpenseConstants.subCategoryId] ?? "").toString(),
+        year: (json[ExpenseConstants.year] ?? "").toString().toInputFormat(),
+        month: (json[ExpenseConstants.month] ?? "").toString().toInputFormat(),
+        dayOfMonth: (json[ExpenseConstants.dayOfMonth] ?? "")
+            .toString()
+            .toInputFormat(),
+        timeStamp:
+            (json[ExpenseConstants.timeStamp] ?? "").toString().toInputFormat(),
+        status:
+            (json[ExpenseConstants.status] ?? "").toString().toInputFormat(),
       );
 
   Map<String, dynamic> toJson() {

@@ -120,13 +120,13 @@ class FirestoreRepository {
         var subCategoryName = "";
         if (category.isNotEmpty) {
           subCategoryName =
-              subCategory.first.get(CategoryConstants.categoryName);
+              subCategory.first.get(SubCategoryConstants.subCategoryName);
         }
 
         var subCategoryColor = 4288585374;
         if (category.isNotEmpty) {
           subCategoryColor =
-              subCategory.first.get(CategoryConstants.categoryColor);
+              subCategory.first.get(SubCategoryConstants.subCategoryColor);
         }
 
         expense.add(ExpenseCategoryModel(
@@ -154,21 +154,25 @@ class FirestoreRepository {
         var date2 = a.date.toDateGlobalFormat() ?? DateTime.now();
         return date1.compareTo(date2);
       });
+
+      print(expense); //TODO JIWO
+
       return Right(expense);
     } catch (ex) {
+      print(ex); //TODO JIWO
       return Left(ServerFailure(ex.toString()));
     }
   }
 
   Future<Either<Failure, List<ExpenseCategoryModel>>> getExpense(
-      int month, int year, String subCategory) async {
+      int month, int year, String subCategoryId) async {
     try {
       QuerySnapshot? expenseSnapShoot;
-      if (subCategory.isNotEmpty) {
+      if (subCategoryId.isNotEmpty) {
         expenseSnapShoot = await _expenseCollection
             .where('month', isEqualTo: month.addZeroPref())
             .where('year', isEqualTo: year.toString())
-            .where('subCategoryName', isEqualTo: subCategory)
+            .where('subCategoryId', isEqualTo: subCategoryId)
             .get();
       } else {
         expenseSnapShoot = await _expenseCollection

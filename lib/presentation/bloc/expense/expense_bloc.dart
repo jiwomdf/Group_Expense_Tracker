@@ -70,7 +70,7 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
     on<GetExpenseEvent>((event, emit) async {
       emit(ExpenseLoading());
       var expenses = await _firestoreRepository.getExpense(
-          event.month, event.year, event.subCategory);
+          event.month, event.year, event.subCategoryId);
       expenses.fold((failure) {
         emit(ExpenseError(failure.message));
       }, (data) {
