@@ -57,13 +57,22 @@ class AppHomeState extends State<AppHome> {
         ));
   }
 
-  void changeTheme(ThemeMode themeMode) {
+  void changeTheme(ThemeMode themeMode) async {
+    final isDarkMode = themeMode == ThemeMode.dark;
+    await di.locator<AuthRepository>().setIsDarkMode(isDarkMode);
     setState(() {
       _themeMode = themeMode;
     });
   }
 
-  bool isLightMode() => _themeMode == ThemeMode.light;
+  Future<bool> getIsDarkMode() async {
+    final isDarkMode = await di.locator<AuthRepository>().getIsDarkMode();
+    return isDarkMode.fold((failure) {
+      return false;
+    }, (result) {
+      return result;
+    });
+  }
 }
 
 initMaterialApp(ThemeMode themeMode) {

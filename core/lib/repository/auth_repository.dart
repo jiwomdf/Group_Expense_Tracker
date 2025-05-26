@@ -51,11 +51,13 @@ class AuthRepository {
       );
 
       if (credential.user != null) {
-        return Right(UserDataModel(
+        final data = UserDataModel(
           uid: credential.user?.uid ?? '',
           email: credential.user?.email ?? '',
           name: credential.user?.displayName ?? '',
-        ));
+        );
+        await authPref.setUserDataModel(data);
+        return Right(data);
       }
       return const Left(GeneralFailure("credential user empty"));
     } catch (e) {
@@ -67,7 +69,12 @@ class AuthRepository {
     await firebaseAuth.signOut();
   }
 
-  Future<Either<Failure, UserDataModel>> getUserDataModel() async {
-    return authPref.getUserDataModel();
-  }
+  Future<Either<Failure, UserDataModel>> getUserDataModel() async =>
+      authPref.getUserDataModel();
+
+  Future<Either<Failure, bool>> setIsDarkMode(bool isDarkMode) async =>
+      authPref.setIsDarkMode(isDarkMode);
+
+  Future<Either<Failure, bool>> getIsDarkMode() async =>
+      authPref.getIsDarkMode();
 }

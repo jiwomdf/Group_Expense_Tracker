@@ -27,7 +27,15 @@ class _RightDrawerState extends State<RightDrawer> {
   void initState() {
     super.initState();
     context.read<UserDataModelBloc>().add(const GetUserDataModelEvent());
-    _isLight = AppHome.of(context).isLightMode();
+    if (mounted) {
+      final appHome = AppHome.of(context);
+      final isDarkMode = appHome.getIsDarkMode();
+      Future.microtask(() => isDarkMode).then((value) {
+        setState(() {
+          _isLight = !value;
+        });
+      });
+    }
   }
 
   @override
@@ -187,14 +195,7 @@ class _RightDrawerState extends State<RightDrawer> {
               : AppColors.purple.purpleSoftLight,
           value: _isLight,
           onChanged: (value) {
-            setState(() {
-              _isLight = value;
-              if (_isLight) {
-                AppHome.of(context).changeTheme(ThemeMode.light);
-              } else {
-                AppHome.of(context).changeTheme(ThemeMode.dark);
-              }
-            });
+            _setTheme(AppHome.of(context), value);
           }),
     );
   }
@@ -302,5 +303,16 @@ class _RightDrawerState extends State<RightDrawer> {
             fontWeight: FontWeight.w600,
           )),
     );
+  }
+
+  void _setTheme(AppHomeState appHome, bool value) {
+    setState(() {
+      _isLight = value;
+    });
+    if (_isLight) {
+      appHome.changeTheme(ThemeMode.light);
+    } else {
+      appHome.changeTheme(ThemeMode.dark);
+    }
   }
 }

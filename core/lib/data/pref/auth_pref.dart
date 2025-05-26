@@ -36,4 +36,24 @@ class AuthPref {
       return Left(GeneralFailure(e.toString()));
     }
   }
+
+  Future<Either<Failure, bool>> setIsDarkMode(bool isDarkMode) async {
+    try {
+      bool result = await prefs.setBool(userPref, isDarkMode);
+      return Right(result);
+    } catch (e) {
+      //TODO JIWO
+      print("eee + ${e.toString()}");
+      return Left(GeneralFailure(e.toString()));
+    }
+  }
+
+  Future<Either<Failure, bool>> getIsDarkMode() async {
+    try {
+      bool result = prefs.getBool(userPref) ?? false;
+      return Right(result);
+    } catch (e) {
+      return Left(GeneralFailure(e.toString()));
+    }
+  }
 }

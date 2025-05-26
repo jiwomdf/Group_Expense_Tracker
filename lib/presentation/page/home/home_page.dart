@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:group_expense_tracker/app/apps/app_home.dart';
 import 'package:group_expense_tracker/generated/l10n.dart';
 import 'package:group_expense_tracker/presentation/bloc/expense/expense_bloc.dart';
 import 'package:group_expense_tracker/presentation/bloc/subcategory/subcategory_bloc.dart';
@@ -29,6 +30,13 @@ class _HomePageState extends State<HomePage> {
 
     context.read<SubcategoryBloc>().add(const GetSubcategoryWithCacheEvent());
     context.read<ExpenseBloc>().add(const ResetExpenseEvent());
+    if (mounted) {
+      final appHome = AppHome.of(context);
+      final isDarkMode = appHome.getIsDarkMode();
+      Future.microtask(() => isDarkMode).then((value) {
+        _setTheme(appHome, !value);
+      });
+    }
   }
 
   @override
@@ -90,5 +98,15 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
     );
+  }
+
+  void _setTheme(AppHomeState appHome, bool value) {
+    //TODO JIWO
+    print("value: $value");
+    if (value) {
+      appHome.changeTheme(ThemeMode.light);
+    } else {
+      appHome.changeTheme(ThemeMode.dark);
+    }
   }
 }
