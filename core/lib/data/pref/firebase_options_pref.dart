@@ -4,7 +4,7 @@ import 'package:core/domain/model/failure.dart';
 import 'package:core/domain/model/firebase_options_android_model.dart';
 import 'package:core/domain/model/firebase_options_ios_model.dart';
 import 'package:core/domain/model/firebase_options_web_model.dart';
-import 'package:dartz/dartz.dart';
+import 'package:core/util/resource/resource_util.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class FirebaseOptionsPref {
@@ -27,19 +27,19 @@ class FirebaseOptionsPref {
     }
   }
 
-  Future<Either<Failure, FirebaseOptionsAndroidModel>>
+  Future<ResourceUtil<FirebaseOptionsAndroidModel>>
       getFirebaseOptionsModelAndroid() async {
     try {
       String result = prefs.getString(foAndroidPref) ?? '';
       Map<String, dynamic> model = jsonDecode(result);
 
       if (result.isEmpty) {
-        return const Left(GeneralFailure('user data not found'));
+        return ResourceUtil.error(const GeneralFailure('user data not found'));
       } else {
-        return Right(FirebaseOptionsAndroidModel.fromMap(model));
+        return ResourceUtil.success(FirebaseOptionsAndroidModel.fromMap(model));
       }
     } catch (e) {
-      return Left(GeneralFailure(e.toString()));
+      return ResourceUtil.error(GeneralFailure(e.toString()));
     }
   }
 
@@ -54,19 +54,19 @@ class FirebaseOptionsPref {
     }
   }
 
-  Future<Either<Failure, FirebaseOptionsIOSModel>>
+  Future<ResourceUtil<FirebaseOptionsIOSModel>>
       getFirebaseOptionsModeliOS() async {
     try {
       String result = prefs.getString(foIOSPref) ?? '';
       Map<String, dynamic> model = jsonDecode(result);
 
       if (result.isEmpty) {
-        return const Left(GeneralFailure('user data not found'));
+        return ResourceUtil.error(const GeneralFailure('user data not found'));
       } else {
-        return Right(FirebaseOptionsIOSModel.fromMap(model));
+        return ResourceUtil.success(FirebaseOptionsIOSModel.fromMap(model));
       }
     } catch (e) {
-      return Left(GeneralFailure(e.toString()));
+      return ResourceUtil.error(GeneralFailure(e.toString()));
     }
   }
 
@@ -81,19 +81,19 @@ class FirebaseOptionsPref {
     }
   }
 
-  Future<Either<Failure, FirebaseOptionsWebModel>>
+  Future<ResourceUtil<FirebaseOptionsWebModel>>
       getFirebaseOptionsModelWeb() async {
     try {
       String result = prefs.getString(foWebPref) ?? '';
       Map<String, dynamic> model = jsonDecode(result);
 
       if (result.isEmpty) {
-        return const Left(GeneralFailure('user data not found'));
+        return ResourceUtil.error(const GeneralFailure('user data not found'));
       } else {
-        return Right(FirebaseOptionsWebModel.fromMap(model));
+        return ResourceUtil.success(FirebaseOptionsWebModel.fromMap(model));
       }
     } catch (e) {
-      return Left(GeneralFailure(e.toString()));
+      return ResourceUtil.error(GeneralFailure(e.toString()));
     }
   }
 }

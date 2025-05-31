@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:core/data/pref/auth_pref.dart';
 import 'package:core/domain/model/failure.dart';
 import 'package:core/domain/model/user_model.dart';
-import 'package:dartz/dartz.dart';
+import 'package:core/util/resource/resource_util.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class AuthRepository {
@@ -18,37 +18,33 @@ class AuthRepository {
     });
   }
 
-  Future<Either<Failure, bool>> register(String email, String password) async {
+  Future<ResourceUtil<bool>> register(String email, String password) async {
     try {
-      final UserCredential credential =
-          await firebaseAuth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      final UserCredential credential = await firebaseAuth
+          .createUserWithEmailAndPassword(email: email, password: password);
 
-      if (credential.user != null) {
-        bool isSuccess = await authPref.setUserDataModel(UserDataModel(
-          uid: credential.user?.uid ?? '',
-          email: credential.user?.email ?? '',
-          name: credential.user?.displayName ?? '',
-        ));
-
-        return Right(isSuccess);
+      if (credential.user == null) {
+        return ResourceUtil.error(
+            const GeneralFailure("credential user empty"));
       }
-      return const Left(GeneralFailure("credential user empty"));
+
+      bool isSuccess = await authPref.setUserDataModel(UserDataModel(
+        uid: credential.user?.uid ?? '',
+        email: credential.user?.email ?? '',
+        name: credential.user?.displayName ?? '',
+      ));
+
+      return ResourceUtil.success(isSuccess);
     } catch (e) {
-      return Left(GeneralFailure(e.toString()));
+      return ResourceUtil.error(GeneralFailure(e.toString()));
     }
   }
 
-  Future<Either<Failure, UserDataModel>> login(
+  Future<ResourceUtil<UserDataModel>> login(
       String email, String password) async {
     try {
-      final UserCredential credential =
-          await firebaseAuth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      final UserCredential credential = await firebaseAuth
+          .signInWithEmailAndPassword(email: email, password: password);
 
       if (credential.user != null) {
         final data = UserDataModel(
@@ -57,11 +53,11 @@ class AuthRepository {
           name: credential.user?.displayName ?? '',
         );
         await authPref.setUserDataModel(data);
-        return Right(data);
+        return ResourceUtil.success(data);
       }
-      return const Left(GeneralFailure("credential user empty"));
+      return ResourceUtil.error(const GeneralFailure("credential user empty"));
     } catch (e) {
-      return Left(GeneralFailure(e.toString()));
+      return ResourceUtil.error(GeneralFailure(e.toString()));
     }
   }
 
@@ -69,12 +65,11 @@ class AuthRepository {
     await firebaseAuth.signOut();
   }
 
-  Future<Either<Failure, UserDataModel>> getUserDataModel() async =>
+  Future<ResourceUtil<UserDataModel>> getUserDataModel() async =>
       authPref.getUserDataModel();
 
-  Future<Either<Failure, bool>> setIsDarkMode(bool isDarkMode) async =>
+  Future<ResourceUtil<bool>> setIsDarkMode(bool isDarkMode) async =>
       authPref.setIsDarkMode(isDarkMode);
 
-  Future<Either<Failure, bool>> getIsDarkMode() async =>
-      authPref.getIsDarkMode();
+  Future<ResourceUtil<bool>> getIsDarkMode() async => authPref.getIsDarkMode();
 }

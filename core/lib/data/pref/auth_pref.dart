@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:core/domain/model/failure.dart';
 import 'package:core/domain/model/user_model.dart';
-import 'package:dartz/dartz.dart';
+import 'package:core/util/resource/resource_util.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthPref {
@@ -23,36 +23,36 @@ class AuthPref {
     }
   }
 
-  Future<Either<Failure, UserDataModel>> getUserDataModel() async {
+  Future<ResourceUtil<UserDataModel>> getUserDataModel() async {
     try {
       String result = prefs.getString(userPref) ?? '';
       Map<String, dynamic> userMap = jsonDecode(result);
 
       if (result.isEmpty) {
-        return const Left(GeneralFailure('user data not found'));
+        return ResourceUtil.error(const GeneralFailure('user data not found'));
       } else {
-        return Right(UserDataModel.fromMap(userMap));
+        return ResourceUtil.success(UserDataModel.fromMap(userMap));
       }
     } catch (e) {
-      return Left(GeneralFailure(e.toString()));
+      return ResourceUtil.error(GeneralFailure(e.toString()));
     }
   }
 
-  Future<Either<Failure, bool>> setIsDarkMode(bool isDarkMode) async {
+  Future<ResourceUtil<bool>> setIsDarkMode(bool isDarkMode) async {
     try {
       bool result = await prefs.setBool(isDarkModePref, isDarkMode);
-      return Right(result);
+      return ResourceUtil.success(result);
     } catch (e) {
-      return Left(GeneralFailure(e.toString()));
+      return ResourceUtil.error(GeneralFailure(e.toString()));
     }
   }
 
-  Future<Either<Failure, bool>> getIsDarkMode() async {
+  Future<ResourceUtil<bool>> getIsDarkMode() async {
     try {
       bool result = prefs.getBool(isDarkModePref) ?? false;
-      return Right(result);
+      return ResourceUtil.success(result);
     } catch (e) {
-      return Left(GeneralFailure(e.toString()));
+      return ResourceUtil.error(GeneralFailure(e.toString()));
     }
   }
 }

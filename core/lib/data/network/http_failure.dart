@@ -1,9 +1,10 @@
 import 'package:core/data/network/error_handler.dart';
+import 'package:core/domain/model/failure.dart';
 
-class HttpFailure {
-  int code;
-  String message;
-  DataSource dataSource;
+class HttpFailure extends Failure {
+  final int code;
+  final DataSource dataSource;
 
-  HttpFailure(this.code, this.message, this.dataSource);
+  const HttpFailure(this.code, String message, this.dataSource)
+      : super(message);
 }

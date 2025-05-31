@@ -4,11 +4,11 @@ import 'package:core/domain/model/category_model.dart';
 import 'package:core/domain/model/expense_category_model.dart';
 import 'package:core/domain/model/failure.dart';
 import 'package:core/domain/model/sub_category_model.dart';
-import 'package:core/util/color_util.dart';
-import 'package:core/util/date_format_util.dart';
+import 'package:core/util/extension/color_util.dart';
+import 'package:core/util/extension/date_format_util.dart';
+import 'package:core/util/extension/int_util.dart';
 import 'package:core/util/firestore_constants.dart';
-import 'package:core/util/int_util.dart';
-import 'package:dartz/dartz.dart';
+import 'package:core/util/resource/resource_util.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class FirestoreRepository {
@@ -26,20 +26,20 @@ class FirestoreRepository {
 
   List<SubCategoryModel> subCategoryCache = [];
 
-  Future<Either<Failure, void>> updateExpense({
+  Future<ResourceUtil<void>> updateExpense({
     required String id,
     required Map<String, dynamic> expenseRequest,
   }) async {
     try {
       expenseRequest[ExpenseConstants.email] = firebaseAuth.currentUser?.email;
       await _expenseCollection.doc(id).set(expenseRequest);
-      return const Right(null);
+      return ResourceUtil.success(null);
     } catch (ex) {
-      return Left(ServerFailure(ex.toString()));
+      return ResourceUtil.error(ServerFailure(ex.toString()));
     }
   }
 
-  Future<Either<Failure, void>> updateBatchExpense({
+  Future<ResourceUtil<void>> updateBatchExpense({
     required List<Map<String, dynamic>> listdata,
   }) async {
     try {
@@ -52,25 +52,25 @@ class FirestoreRepository {
       }
 
       batch.commit();
-      return const Right(null);
+      return ResourceUtil.success(null);
     } catch (ex) {
-      return Left(ServerFailure(ex.toString()));
+      return ResourceUtil.error(ServerFailure(ex.toString()));
     }
   }
 
-  Future<Either<Failure, void>> insertExpense(
+  Future<ResourceUtil<void>> insertExpense(
     Map<String, dynamic> expenseRequest,
   ) async {
     try {
       expenseRequest[ExpenseConstants.email] = firebaseAuth.currentUser?.email;
       await _expenseCollection.add(expenseRequest);
-      return const Right(null);
+      return ResourceUtil.success(null);
     } catch (ex) {
-      return Left(ServerFailure(ex.toString()));
+      return ResourceUtil.error(ServerFailure(ex.toString()));
     }
   }
 
-  Future<Either<Failure, void>> insertBatchExpense({
+  Future<ResourceUtil<void>> insertBatchExpense({
     required List<InsertExpenseRequest> listExpenseRequest,
   }) async {
     try {
@@ -83,13 +83,13 @@ class FirestoreRepository {
       }
 
       batch.commit();
-      return const Right(null);
+      return ResourceUtil.success(null);
     } catch (ex) {
-      return Left(ServerFailure(ex.toString()));
+      return ResourceUtil.error(ServerFailure(ex.toString()));
     }
   }
 
-  Future<Either<Failure, List<ExpenseCategoryModel>>> getAllExpense() async {
+  Future<ResourceUtil<List<ExpenseCategoryModel>>> getAllExpense() async {
     try {
       QuerySnapshot expenseSnapShoot = await _expenseCollection.get();
       QuerySnapshot categorySnapShoot = await _categoryCollection.get();
@@ -154,13 +154,13 @@ class FirestoreRepository {
         var date2 = a.date.toDateGlobalFormat() ?? DateTime.now();
         return date1.compareTo(date2);
       });
-      return Right(expense);
+      return ResourceUtil.success(expense);
     } catch (ex) {
-      return Left(ServerFailure(ex.toString()));
+      return ResourceUtil.error(ServerFailure(ex.toString()));
     }
   }
 
-  Future<Either<Failure, List<ExpenseCategoryModel>>> getExpense(
+  Future<ResourceUtil<List<ExpenseCategoryModel>>> getExpense(
       int month, int year, String subCategoryId) async {
     try {
       QuerySnapshot? expenseSnapShoot;
@@ -239,23 +239,22 @@ class FirestoreRepository {
         var date2 = a.date.toDateGlobalFormat() ?? DateTime.now();
         return date1.compareTo(date2);
       });
-      return Right(expense);
+      return ResourceUtil.success(expense);
     } catch (ex) {
-      return Left(ServerFailure(ex.toString()));
+      return ResourceUtil.error(ServerFailure(ex.toString()));
     }
   }
 
-  Future<Either<Failure, void>> deleteExpense(String id) async {
+  Future<ResourceUtil<void>> deleteExpense(String id) async {
     try {
       await _expenseCollection.doc(id).delete();
-
-      return const Right(null);
+      return ResourceUtil.success(null);
     } catch (ex) {
-      return Left(ServerFailure(ex.toString()));
+      return ResourceUtil.error(ServerFailure(ex.toString()));
     }
   }
 
-  Future<Either<Failure, void>> updateCategory({
+  Future<ResourceUtil<void>> updateCategory({
     required String categoryId,
     required String categoryName,
     required int categoryColor,
@@ -269,16 +268,16 @@ class FirestoreRepository {
           CategoryConstants.email: firebaseAuth.currentUser?.email ?? '',
         },
       );
-      return const Right(null);
+      return ResourceUtil.success(null);
     } catch (ex) {
-      return Left(ServerFailure(ex.toString()));
+      return ResourceUtil.error(ServerFailure(ex.toString()));
     }
   }
 
-  Future<Either<Failure, List<CategoryModel>>> getCategory() async {
+  Future<ResourceUtil<List<CategoryModel>>> getCategory() async {
     try {
       QuerySnapshot categorySnapshot = await _categoryCollection.get();
-      return Right(categorySnapshot.docs
+      return ResourceUtil.success(categorySnapshot.docs
           .map(
             (doc) => CategoryModel(
               categoryId: doc.get(CategoryConstants.categoryId),
@@ -288,11 +287,11 @@ class FirestoreRepository {
           )
           .toList());
     } catch (ex) {
-      return Left(ServerFailure(ex.toString()));
+      return ResourceUtil.error(ServerFailure(ex.toString()));
     }
   }
 
-  Future<Either<Failure, void>> updateSubCategory({
+  Future<ResourceUtil<void>> updateSubCategory({
     required String subCategoryId,
     required String categoryName,
     required int categoryColor,
@@ -306,13 +305,13 @@ class FirestoreRepository {
           SubCategoryConstants.email: firebaseAuth.currentUser?.email ?? '',
         },
       );
-      return const Right(null);
+      return ResourceUtil.success(null);
     } catch (ex) {
-      return Left(ServerFailure(ex.toString()));
+      return ResourceUtil.error(ServerFailure(ex.toString()));
     }
   }
 
-  Future<Either<Failure, List<SubCategoryModel>>> getSubCategory() async {
+  Future<ResourceUtil<List<SubCategoryModel>>> getSubCategory() async {
     try {
       QuerySnapshot categorySnapshot = await _subCategoryCollection.get();
       subCategoryCache = categorySnapshot.docs
@@ -324,17 +323,16 @@ class FirestoreRepository {
             ),
           )
           .toList();
-      return Right(subCategoryCache);
+      return ResourceUtil.success(subCategoryCache);
     } catch (ex) {
-      return Left(ServerFailure(ex.toString()));
+      return ResourceUtil.error(ServerFailure(ex.toString()));
     }
   }
 
-  Future<Either<Failure, List<SubCategoryModel>>>
-      getSubCategoryWithCache() async {
+  Future<ResourceUtil<List<SubCategoryModel>>> getSubCategoryWithCache() async {
     try {
       if (subCategoryCache.isNotEmpty) {
-        return Right(subCategoryCache);
+        return ResourceUtil.success(subCategoryCache);
       }
 
       QuerySnapshot categorySnapshot = await _subCategoryCollection.get();
@@ -347,9 +345,9 @@ class FirestoreRepository {
             ),
           )
           .toList();
-      return Right(subCategoryCache);
+      return ResourceUtil.success(subCategoryCache);
     } catch (ex) {
-      return Left(ServerFailure(ex.toString()));
+      return ResourceUtil.error(ServerFailure(ex.toString()));
     }
   }
 }

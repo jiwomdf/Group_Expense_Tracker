@@ -1,6 +1,6 @@
-import 'package:core/util/date_format_util.dart';
+import 'package:core/util/extension/date_format_util.dart';
+import 'package:core/util/extension/string_util.dart';
 import 'package:core/util/firestore_constants.dart';
-import 'package:core/util/string_util.dart';
 
 class InsertExpenseRequest {
   String? email;
