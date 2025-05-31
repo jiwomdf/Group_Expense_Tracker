@@ -7,7 +7,7 @@ final ThemeData defaultThemeData = ThemeData(
   scaffoldBackgroundColor: AppColors.white.primary,
   cardColor: AppColors.purple.bgLightPurple,
   canvasColor: AppColors.purple.bgLightPurple,
-  dialogBackgroundColor: AppColors.white.primary,
+  dialogTheme: DialogTheme(backgroundColor: AppColors.white.primary),
 );
 
 final ThemeData darkThemeData = ThemeData.dark(
@@ -16,9 +16,9 @@ final ThemeData darkThemeData = ThemeData.dark(
   scaffoldBackgroundColor: AppColors.blue.bgDarkBlue,
   cardColor: AppColors.blue.bgCardDarkBlue,
   canvasColor: AppColors.blue.bgCardDarkBlue,
-  dialogBackgroundColor: AppColors.blue.bgDarkBlue,
   colorScheme: ColorScheme.fromSeed(
     brightness: Brightness.dark, // <-- the only line added
     seedColor: AppColors.blue.bgDarkBlue,
   ),
+  dialogTheme: DialogThemeData(backgroundColor: AppColors.blue.bgDarkBlue),
 );

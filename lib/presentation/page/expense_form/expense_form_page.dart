@@ -93,7 +93,7 @@ class _ExpenseFormPageState extends State<ExpenseFormPage> {
                   BlocListener<ExpenseBloc, ExpenseState>(
                     listener: (context, state) {
                       if (state is ExpenseDataChanged) {
-                        Navigator.pop(context, state.isSuccess);
+                        Navigator.pop(context, note);
                         /* TODO, fcm call
                              context.read<FcmBloc>().add(
                                   PostFcmEvent(SendFcmRequest(

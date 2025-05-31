@@ -55,13 +55,12 @@ class _ListExpenseWidgetState extends State<ListExpenseWidget> {
               context,
               ExpenseFormPage.routeName,
               arguments: expenseCategoryModel,
-            ).then((completion) {
+            ).then((note) {
               if (mounted) {
-                if (completion != null) {
-                  context.show(expenseCategoryModel.note +
-                      S
-                          .of(context)
-                          .hasBeenModifiedDataNotShowedYetInorderToSave);
+                if (note != null && note != "") {
+                  context.show(
+                    "$note ${S.of(context).hasBeenModifiedDataNotShowedYetInorderToSave}",
+                  );
                 }
                 context.read<ExpenseBloc>().add(const ResetExpenseEvent());
               }

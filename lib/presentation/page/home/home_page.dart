@@ -14,6 +14,7 @@ import 'package:group_expense_tracker/presentation/page/home/widget/pie_chart_wi
 import 'package:group_expense_tracker/presentation/widget/filter_widget.dart';
 import 'package:group_expense_tracker/presentation/widget/right_drawer.dart';
 import 'package:group_expense_tracker/presentation/widget/toolbar.dart';
+import 'package:group_expense_tracker/util/style/app_snackbar_util.dart';
 
 class HomePage extends StatefulWidget {
   static const routeName = '/home-page';
@@ -116,7 +117,19 @@ class _HomePageState extends State<HomePage> {
                   heroTag: "fab_insert",
                   shape: const CircleBorder(),
                   onPressed: () {
-                    Navigator.pushNamed(context, ExpenseFormPage.routeName);
+                    Navigator.pushNamed(context, ExpenseFormPage.routeName)
+                        .then((note) {
+                      if (context.mounted) {
+                        if (note != null && note != "") {
+                          context.show(
+                            "$note ${S.of(context).hasBeenModifiedDataNotShowedYetInorderToSave}",
+                          );
+                        }
+                        context
+                            .read<ExpenseBloc>()
+                            .add(const ResetExpenseEvent());
+                      }
+                    });
                   },
                   child: const Icon(Icons.add),
                 ),
