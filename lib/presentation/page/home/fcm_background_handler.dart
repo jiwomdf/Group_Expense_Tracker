@@ -1,8 +1,5 @@
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:group_expense_tracker/util/platform_util.dart';
-
-class FcmBackgroundHandler {
+/* TODO, will use later */
+/* class FcmBackgroundHandler {
   Future<void> firebaseMessagingBackgroundHandler(
       RemoteMessage remoteMessage) async {
     await Firebase.initializeApp();
@@ -86,4 +83,4 @@ class FcmBackgroundHandler {
 
     //getDataFcm: name: $name & age: $age
   }
-}
+} **/

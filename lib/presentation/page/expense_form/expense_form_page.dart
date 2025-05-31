@@ -94,7 +94,7 @@ class _ExpenseFormPageState extends State<ExpenseFormPage> {
                     listener: (context, state) {
                       if (state is ExpenseDataChanged) {
                         Navigator.pop(context, state.isSuccess);
-                        /* TODO(JIWO), fcm call
+                        /* TODO, fcm call
                              context.read<FcmBloc>().add(
                                   PostFcmEvent(SendFcmRequest(
                                       to: "/topics/all",
@@ -422,7 +422,7 @@ class _ExpenseFormPageState extends State<ExpenseFormPage> {
               month: insertedMonth,
               dayOfMonth: insertedDayOfMonth,
               timeStamp: timeStamp,
-              status: StatusUtil.UPDATED,
+              status: StatusUtil.updated,
             )));
       } else {
         context.read<ExpenseBloc>().add(InsertExpenseEvent(InsertExpenseRequest(
@@ -435,7 +435,7 @@ class _ExpenseFormPageState extends State<ExpenseFormPage> {
               month: insertedMonth,
               dayOfMonth: insertedDayOfMonth,
               timeStamp: timeStamp,
-              status: StatusUtil.INSERTED,
+              status: StatusUtil.inserted,
             )));
       }
 

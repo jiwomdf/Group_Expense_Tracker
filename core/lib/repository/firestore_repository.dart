@@ -154,12 +154,8 @@ class FirestoreRepository {
         var date2 = a.date.toDateGlobalFormat() ?? DateTime.now();
         return date1.compareTo(date2);
       });
-
-      print(expense); //TODO JIWO
-
       return Right(expense);
     } catch (ex) {
-      print(ex); //TODO JIWO
       return Left(ServerFailure(ex.toString()));
     }
   }

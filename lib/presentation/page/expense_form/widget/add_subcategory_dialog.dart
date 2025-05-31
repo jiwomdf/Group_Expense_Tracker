@@ -85,8 +85,8 @@ class _AddSubCategoryDialogState extends State<AddSubCategoryDialog> {
                         hexInputBar: false,
                         pickerColor: Color(_ddlValue.subCategoryColor),
                         onColorChanged: (color) {
-                          setState(
-                              () => _ddlValue.subCategoryColor = color.value);
+                          setState(() =>
+                              _ddlValue.subCategoryColor = color.toARGB32());
                         },
                       ),
                     ],

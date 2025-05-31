@@ -85,7 +85,8 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
                   child: BlockPicker(
                     pickerColor: Color(_ddlValue.categoryColor),
                     onColorChanged: (color) {
-                      setState(() => _ddlValue.categoryColor = color.value);
+                      setState(
+                          () => _ddlValue.categoryColor = color.toARGB32());
                     },
                   ),
                 ),

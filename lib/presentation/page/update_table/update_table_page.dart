@@ -115,7 +115,7 @@ class _UpdateTablePageState extends State<UpdateTablePage> {
             width: double.infinity,
             child: OutlinedButton(
               onPressed: null
-              /**TODO: update category scheme*/
+              /*TODO: update category scheme*/
               ,
               child: Text("Update all category"),
             ),
