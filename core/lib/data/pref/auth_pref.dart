@@ -9,6 +9,7 @@ class AuthPref {
   final SharedPreferences prefs;
 
   static const String userPref = 'user_pref';
+  static const String isDarkModePref = 'is_dark_mode_pref';
 
   AuthPref({required this.prefs});
 
@@ -39,7 +40,7 @@ class AuthPref {
 
   Future<Either<Failure, bool>> setIsDarkMode(bool isDarkMode) async {
     try {
-      bool result = await prefs.setBool(userPref, isDarkMode);
+      bool result = await prefs.setBool(isDarkModePref, isDarkMode);
       return Right(result);
     } catch (e) {
       return Left(GeneralFailure(e.toString()));
@@ -48,7 +49,7 @@ class AuthPref {
 
   Future<Either<Failure, bool>> getIsDarkMode() async {
     try {
-      bool result = prefs.getBool(userPref) ?? false;
+      bool result = prefs.getBool(isDarkModePref) ?? false;
       return Right(result);
     } catch (e) {
       return Left(GeneralFailure(e.toString()));
