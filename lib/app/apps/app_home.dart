@@ -1,5 +1,6 @@
 import 'package:core/domain/model/user_model.dart';
 import 'package:core/repository/auth_repository.dart';
+import 'package:core/util/resource/resource_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -61,11 +62,17 @@ class AppHomeState extends State<AppHome> {
 
   Future<bool> getIsDarkMode() async {
     final isDarkMode = await di.locator<AuthRepository>().getIsDarkMode();
-    return isDarkMode.fold((failure) {
-      return false;
-    }, (result) {
-      return result;
-    });
+    switch (isDarkMode.status) {
+      case Status.success:
+        if (isDarkMode.data != null) {
+          final nonNullValue = isDarkMode.data as bool;
+          return nonNullValue;
+        }
+        break;
+      case Status.error:
+        break;
+    }
+    return false;
   }
 }
 

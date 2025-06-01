@@ -1,6 +1,6 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:core/data/network/request/send_fcm_request.dart';
-import 'package:dartz/dartz.dart';
+import 'package:core/util/resource/resource_util.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:group_expense_tracker/presentation/bloc/fcm/fcm_bloc.dart';
 import 'package:mockito/mockito.dart';
@@ -27,7 +27,7 @@ void main() {
     'Should emit [ExpenseDataChanged] when data is inserted successfully',
     build: () {
       when(mockFcmRepository.sendFcm(sendFcmRequest))
-          .thenAnswer((_) async => const Right(true));
+          .thenAnswer((_) async => ResourceUtil.success(true));
       return fcmBloc;
     },
     act: (bloc) => bloc.add(PostFcmEvent(sendFcmRequest)),

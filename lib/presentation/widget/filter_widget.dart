@@ -1,5 +1,5 @@
 import 'package:core/domain/model/sub_category_model.dart';
-import 'package:core/util/color_util.dart';
+import 'package:core/util/extension/color_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:group_expense_tracker/presentation/bloc/subcategory/subcategory_bloc.dart';

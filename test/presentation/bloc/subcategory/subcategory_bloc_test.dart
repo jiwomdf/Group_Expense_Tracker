@@ -1,6 +1,6 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:core/domain/model/sub_category_model.dart';
-import 'package:dartz/dartz.dart';
+import 'package:core/util/resource/resource_util.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:group_expense_tracker/presentation/bloc/subcategory/subcategory_bloc.dart';
 import 'package:mockito/mockito.dart';
@@ -36,7 +36,7 @@ void main() {
     'Should emit [GetSubcategoryEvent] when data is get successfully',
     build: () {
       when(mockFirestoreRepository.getSubCategory())
-          .thenAnswer((_) async => Right(subCategoryList));
+          .thenAnswer((_) async => ResourceUtil.success(subCategoryList));
       return registerBloc;
     },
     act: (bloc) => bloc.add(const GetSubcategoryEvent()),
@@ -57,7 +57,7 @@ void main() {
         subCategoryId: subCategoryModel.subCategoryId,
         categoryName: categoryName,
         categoryColor: categoryColor,
-      )).thenAnswer((_) async => const Right(null));
+      )).thenAnswer((_) async => ResourceUtil.success(null));
       return registerBloc;
     },
     act: (bloc) => bloc.add(UpdateSubcategoryEvent(subCategoryModel)),

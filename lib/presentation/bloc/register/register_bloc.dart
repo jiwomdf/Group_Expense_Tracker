@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:core/repository/auth_repository.dart';
+import 'package:core/util/resource/resource_util.dart';
 import 'package:equatable/equatable.dart';
 
 part 'register_event.dart';
@@ -14,14 +15,14 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
       final result =
           await _authRepository.register(event.email, event.password);
 
-      result.fold(
-        (failure) {
-          emit(RegisterError(failure.message));
-        },
-        (data) {
-          emit(RegisterHasData(data));
-        },
-      );
+      switch (result.status) {
+        case Status.success:
+          emit(RegisterHasData(result.data ?? false));
+          break;
+        case Status.error:
+          emit(RegisterError(result.failure?.message ?? ""));
+          break;
+      }
     });
   }
 }

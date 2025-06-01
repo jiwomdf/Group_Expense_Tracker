@@ -1,5 +1,5 @@
 import 'package:bloc_test/bloc_test.dart';
-import 'package:dartz/dartz.dart';
+import 'package:core/util/resource/resource_util.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:group_expense_tracker/presentation/bloc/register/register_bloc.dart';
 import 'package:mockito/mockito.dart';
@@ -21,7 +21,7 @@ void main() {
     'Should emit [GetLoginEvent] when data is inserted successfully',
     build: () {
       when(mockAuthRepository.register(email, password))
-          .thenAnswer((_) async => const Right(true));
+          .thenAnswer((_) async => ResourceUtil.success(true));
       return registerBloc;
     },
     act: (bloc) => bloc.add(const GetRegisterEvent(email, password)),

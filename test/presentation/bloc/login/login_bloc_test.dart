@@ -1,6 +1,6 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:core/domain/model/user_model.dart';
-import 'package:dartz/dartz.dart';
+import 'package:core/util/resource/resource_util.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:group_expense_tracker/presentation/bloc/login/login_bloc.dart';
 import 'package:mockito/mockito.dart';
@@ -24,7 +24,7 @@ void main() {
     'Should emit [GetLoginEvent] when data is inserted successfully',
     build: () {
       when(mockAuthRepository.login(email, password))
-          .thenAnswer((_) async => Right(userDataModel));
+          .thenAnswer((_) async => ResourceUtil.success(userDataModel));
       return loginBloc;
     },
     act: (bloc) => bloc.add(const GetLoginEvent(email, password)),

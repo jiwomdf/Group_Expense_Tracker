@@ -1,6 +1,6 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:core/domain/model/category_model.dart';
-import 'package:dartz/dartz.dart';
+import 'package:core/util/resource/resource_util.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:group_expense_tracker/presentation/bloc/category/category_bloc.dart';
 import 'package:mockito/mockito.dart';
@@ -31,7 +31,7 @@ void main() {
               categoryId: categoryModel.categoryId,
               categoryName: categoryModel.categoryName,
               categoryColor: categoryModel.categoryColor))
-          .thenAnswer((_) async => const Right(null));
+          .thenAnswer((_) async => ResourceUtil.success(null));
       return categoryBloc;
     },
     act: (bloc) => bloc.add(UpdateCategoryEvent(categoryModel)),
@@ -51,7 +51,7 @@ void main() {
     'Should emit [Loading, HasData] when data is gotten successfully',
     build: () {
       when(mockFirestoreRepository.getCategory())
-          .thenAnswer((_) async => Right([testCategory]));
+          .thenAnswer((_) async => ResourceUtil.success([testCategory]));
       return categoryBloc;
     },
     act: (bloc) => bloc.add(const GetCategoryEvent()),

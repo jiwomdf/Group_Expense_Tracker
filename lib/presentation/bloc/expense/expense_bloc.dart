@@ -3,6 +3,7 @@ import 'package:core/data/network/request/insert_expense_request.dart';
 import 'package:core/data/network/request/update_expense_request.dart';
 import 'package:core/domain/model/expense_category_model.dart';
 import 'package:core/repository/firestore_repository.dart';
+import 'package:core/util/resource/resource_util.dart';
 import 'package:equatable/equatable.dart';
 import 'package:group_expense_tracker/util/ext/date_format_util.dart';
 
@@ -18,21 +19,27 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
     on<InsertExpenseEvent>((event, emit) async {
       var expenses = await _firestoreRepository
           .insertExpense(event.expenseRequest.toJson());
-
-      expenses.fold((failure) {
-        emit(ExpenseError(failure.message));
-      }, (data) {
-        emit(const ExpenseDataChanged(true));
-      });
+      switch (expenses.status) {
+        case Status.success:
+          emit(const ExpenseDataChanged(true));
+          break;
+        case Status.error:
+          emit(ExpenseError(expenses.failure?.message ?? ""));
+          break;
+      }
     });
 
     on<InsertBatchExpenseEvent>((event, emit) async {
       var expenses = await _firestoreRepository.insertBatchExpense(
           listExpenseRequest: event.listExpenseRequest);
 
-      expenses.fold((failure) {
-        emit(ExpenseError(failure.message));
-      }, (data) {});
+      switch (expenses.status) {
+        case Status.success:
+          break;
+        case Status.error:
+          emit(ExpenseError(expenses.failure?.message ?? ""));
+          break;
+      }
     });
 
     on<UpdateBatchExpenseEvent>((event, emit) async {
@@ -40,9 +47,13 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
         listdata: event.updateBatchExpense,
       );
 
-      expenses.fold((failure) {
-        emit(ExpenseError(failure.message));
-      }, (data) {});
+      switch (expenses.status) {
+        case Status.success:
+          break;
+        case Status.error:
+          emit(ExpenseError(expenses.failure?.message ?? ""));
+          break;
+      }
     });
 
     on<UpdateExpenseEvent>((event, emit) async {
@@ -51,51 +62,55 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
         expenseRequest: event.expenseRequest.toJson(),
       );
 
-      expenses.fold((failure) {
-        emit(ExpenseError(failure.message));
-      }, (data) {
-        emit(const ExpenseDataChanged(true));
-      });
+      switch (expenses.status) {
+        case Status.success:
+          emit(const ExpenseDataChanged(true));
+          break;
+        case Status.error:
+          emit(ExpenseError(expenses.failure?.message ?? ""));
+          break;
+      }
     });
 
     on<DeleteExpenseEvent>((event, emit) async {
       var expenses = await _firestoreRepository.deleteExpense(event.id);
-      expenses.fold((failure) {
-        emit(ExpenseError(failure.message));
-      }, (data) {
-        emit(const ExpenseDataChanged(true));
-      });
+      switch (expenses.status) {
+        case Status.success:
+          emit(const ExpenseDataChanged(true));
+          break;
+        case Status.error:
+          emit(ExpenseError(expenses.failure?.message ?? ""));
+          break;
+      }
     });
 
     on<GetExpenseEvent>((event, emit) async {
       emit(ExpenseLoading());
       var expenses = await _firestoreRepository.getExpense(
           event.month, event.year, event.subCategoryId);
-      expenses.fold((failure) {
-        emit(ExpenseError(failure.message));
-      }, (data) {
-        if (data.isEmpty) {
-          emit(const ExpenseEmpty());
-        } else {
-          _tempExpense = data;
-          emit(ExpenseHasData(data));
-        }
-      });
+      switch (expenses.status) {
+        case Status.success:
+          _tempExpense = expenses.data ?? [];
+          emit(ExpenseHasData(expenses.data ?? []));
+          break;
+        case Status.error:
+          emit(ExpenseError(expenses.failure?.message ?? ""));
+          break;
+      }
     });
 
     on<GetAllExpenseEvent>((event, emit) async {
       emit(ExpenseLoading());
       var expenses = await _firestoreRepository.getAllExpense();
-      expenses.fold((failure) {
-        emit(ExpenseError(failure.message));
-      }, (data) {
-        if (data.isEmpty) {
-          emit(const ExpenseEmpty());
-        } else {
-          _tempExpense = data;
-          emit(ExpenseHasData(data));
-        }
-      });
+      switch (expenses.status) {
+        case Status.success:
+          _tempExpense = expenses.data ?? [];
+          emit(ExpenseHasData(expenses.data ?? []));
+          break;
+        case Status.error:
+          emit(ExpenseError(expenses.failure?.message ?? ""));
+          break;
+      }
     });
 
     on<FilterExpenseEvent>((event, emit) async {

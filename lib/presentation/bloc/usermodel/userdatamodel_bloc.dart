@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:core/domain/model/user_model.dart';
 import 'package:core/repository/auth_repository.dart';
+import 'package:core/util/resource/resource_util.dart';
 import 'package:equatable/equatable.dart';
 
 part 'userdatamodel_event.dart';
@@ -13,14 +14,20 @@ class UserDataModelBloc extends Bloc<UserDataModelEvent, UserDataModelState> {
     on<GetUserDataModelEvent>((event, emit) async {
       emit(UserDataModelLoading());
       final result = await _authRepository.getUserDataModel();
-      result.fold(
-        (failure) {
-          emit(UserDataModelError(failure.message));
-        },
-        (data) {
-          emit(UserDataModelHasData(data));
-        },
-      );
+
+      switch (result.status) {
+        case Status.success:
+          if (result.data != null) {
+            final nonNullValue = result.data as UserDataModel;
+            emit(UserDataModelHasData(nonNullValue));
+          } else {
+            emit(UserDataModelError(result.failure?.message ?? ""));
+          }
+          break;
+        case Status.error:
+          emit(UserDataModelError(result.failure?.message ?? ""));
+          break;
+      }
     });
   }
 }

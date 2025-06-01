@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:core/domain/model/category_model.dart';
 import 'package:core/repository/firestore_repository.dart';
+import 'package:core/util/resource/resource_util.dart';
 import 'package:equatable/equatable.dart';
 
 part 'category_event.dart';
@@ -16,22 +17,27 @@ class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
         categoryName: event.categoryModel.categoryName,
         categoryColor: event.categoryModel.categoryColor,
       );
-
-      category.fold((failure) {
-        emit(CategoryError(failure.message));
-      }, (data) {
-        emit(const CategoryUpdated());
-      });
+      switch (category.status) {
+        case Status.success:
+          emit(const CategoryUpdated());
+          break;
+        case Status.error:
+          emit(CategoryError(category.failure?.message ?? ""));
+          break;
+      }
     });
 
     on<GetCategoryEvent>((event, emit) async {
       emit(CategoryLoading());
       var category = await _firestoreRepository.getCategory();
-      category.fold((failure) {
-        emit(CategoryError(failure.message));
-      }, (data) {
-        emit(CategoryHasData(data));
-      });
+      switch (category.status) {
+        case Status.success:
+          emit(CategoryHasData(category.data ?? []));
+          break;
+        case Status.error:
+          emit(CategoryError(category.failure?.message ?? ""));
+          break;
+      }
     });
 
     on<ResetCategoryEvent>((event, emit) async {

@@ -5,18 +5,17 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _i8;
 
-import 'package:core/data/network/request/insert_expense_request.dart' as _i10;
-import 'package:core/data/network/request/send_fcm_request.dart' as _i14;
+import 'package:core/data/network/request/insert_expense_request.dart' as _i9;
+import 'package:core/data/network/request/send_fcm_request.dart' as _i13;
 import 'package:core/data/pref/auth_pref.dart' as _i5;
-import 'package:core/domain/model/category_model.dart' as _i12;
-import 'package:core/domain/model/expense_category_model.dart' as _i11;
-import 'package:core/domain/model/failure.dart' as _i9;
+import 'package:core/domain/model/category_model.dart' as _i11;
+import 'package:core/domain/model/expense_category_model.dart' as _i10;
 import 'package:core/domain/model/sub_category_model.dart' as _i7;
-import 'package:core/domain/model/user_model.dart' as _i16;
-import 'package:core/repository/auth_repository.dart' as _i15;
-import 'package:core/repository/fcm_repository.dart' as _i13;
+import 'package:core/domain/model/user_model.dart' as _i15;
+import 'package:core/repository/auth_repository.dart' as _i14;
+import 'package:core/repository/fcm_repository.dart' as _i12;
 import 'package:core/repository/firestore_repository.dart' as _i6;
-import 'package:dartz/dartz.dart' as _i3;
+import 'package:core/util/resource/resource_util.dart' as _i3;
 import 'package:firebase_auth/firebase_auth.dart' as _i2;
 import 'package:http/http.dart' as _i4;
 import 'package:mockito/mockito.dart' as _i1;
@@ -44,8 +43,9 @@ class _FakeFirebaseAuth_0 extends _i1.SmartFake implements _i2.FirebaseAuth {
         );
 }
 
-class _FakeEither_1<L, R> extends _i1.SmartFake implements _i3.Either<L, R> {
-  _FakeEither_1(
+class _FakeResourceUtil_1<T> extends _i1.SmartFake
+    implements _i3.ResourceUtil<T> {
+  _FakeResourceUtil_1(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -109,7 +109,7 @@ class MockFirestoreRepository extends _i1.Mock
       );
 
   @override
-  _i8.Future<_i3.Either<_i9.Failure, void>> updateExpense({
+  _i8.Future<_i3.ResourceUtil<void>> updateExpense({
     required String? id,
     required Map<String, dynamic>? expenseRequest,
   }) =>
@@ -122,8 +122,8 @@ class MockFirestoreRepository extends _i1.Mock
             #expenseRequest: expenseRequest,
           },
         ),
-        returnValue: _i8.Future<_i3.Either<_i9.Failure, void>>.value(
-            _FakeEither_1<_i9.Failure, void>(
+        returnValue:
+            _i8.Future<_i3.ResourceUtil<void>>.value(_FakeResourceUtil_1<void>(
           this,
           Invocation.method(
             #updateExpense,
@@ -134,10 +134,10 @@ class MockFirestoreRepository extends _i1.Mock
             },
           ),
         )),
-      ) as _i8.Future<_i3.Either<_i9.Failure, void>>);
+      ) as _i8.Future<_i3.ResourceUtil<void>>);
 
   @override
-  _i8.Future<_i3.Either<_i9.Failure, void>> updateBatchExpense(
+  _i8.Future<_i3.ResourceUtil<void>> updateBatchExpense(
           {required List<Map<String, dynamic>>? listdata}) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -145,8 +145,8 @@ class MockFirestoreRepository extends _i1.Mock
           [],
           {#listdata: listdata},
         ),
-        returnValue: _i8.Future<_i3.Either<_i9.Failure, void>>.value(
-            _FakeEither_1<_i9.Failure, void>(
+        returnValue:
+            _i8.Future<_i3.ResourceUtil<void>>.value(_FakeResourceUtil_1<void>(
           this,
           Invocation.method(
             #updateBatchExpense,
@@ -154,37 +154,37 @@ class MockFirestoreRepository extends _i1.Mock
             {#listdata: listdata},
           ),
         )),
-      ) as _i8.Future<_i3.Either<_i9.Failure, void>>);
+      ) as _i8.Future<_i3.ResourceUtil<void>>);
 
   @override
-  _i8.Future<_i3.Either<_i9.Failure, void>> insertExpense(
+  _i8.Future<_i3.ResourceUtil<void>> insertExpense(
           Map<String, dynamic>? expenseRequest) =>
       (super.noSuchMethod(
         Invocation.method(
           #insertExpense,
           [expenseRequest],
         ),
-        returnValue: _i8.Future<_i3.Either<_i9.Failure, void>>.value(
-            _FakeEither_1<_i9.Failure, void>(
+        returnValue:
+            _i8.Future<_i3.ResourceUtil<void>>.value(_FakeResourceUtil_1<void>(
           this,
           Invocation.method(
             #insertExpense,
             [expenseRequest],
           ),
         )),
-      ) as _i8.Future<_i3.Either<_i9.Failure, void>>);
+      ) as _i8.Future<_i3.ResourceUtil<void>>);
 
   @override
-  _i8.Future<_i3.Either<_i9.Failure, void>> insertBatchExpense(
-          {required List<_i10.InsertExpenseRequest>? listExpenseRequest}) =>
+  _i8.Future<_i3.ResourceUtil<void>> insertBatchExpense(
+          {required List<_i9.InsertExpenseRequest>? listExpenseRequest}) =>
       (super.noSuchMethod(
         Invocation.method(
           #insertBatchExpense,
           [],
           {#listExpenseRequest: listExpenseRequest},
         ),
-        returnValue: _i8.Future<_i3.Either<_i9.Failure, void>>.value(
-            _FakeEither_1<_i9.Failure, void>(
+        returnValue:
+            _i8.Future<_i3.ResourceUtil<void>>.value(_FakeResourceUtil_1<void>(
           this,
           Invocation.method(
             #insertBatchExpense,
@@ -192,34 +192,31 @@ class MockFirestoreRepository extends _i1.Mock
             {#listExpenseRequest: listExpenseRequest},
           ),
         )),
-      ) as _i8.Future<_i3.Either<_i9.Failure, void>>);
+      ) as _i8.Future<_i3.ResourceUtil<void>>);
 
   @override
-  _i8.Future<_i3.Either<_i9.Failure, List<_i11.ExpenseCategoryModel>>>
+  _i8.Future<_i3.ResourceUtil<List<_i10.ExpenseCategoryModel>>>
       getAllExpense() => (super.noSuchMethod(
             Invocation.method(
               #getAllExpense,
               [],
             ),
             returnValue: _i8.Future<
-                    _i3.Either<_i9.Failure,
-                        List<_i11.ExpenseCategoryModel>>>.value(
-                _FakeEither_1<_i9.Failure, List<_i11.ExpenseCategoryModel>>(
+                    _i3.ResourceUtil<List<_i10.ExpenseCategoryModel>>>.value(
+                _FakeResourceUtil_1<List<_i10.ExpenseCategoryModel>>(
               this,
               Invocation.method(
                 #getAllExpense,
                 [],
               ),
             )),
-          ) as _i8.Future<
-              _i3.Either<_i9.Failure, List<_i11.ExpenseCategoryModel>>>);
+          ) as _i8.Future<_i3.ResourceUtil<List<_i10.ExpenseCategoryModel>>>);
 
   @override
-  _i8.Future<
-      _i3.Either<_i9.Failure, List<_i11.ExpenseCategoryModel>>> getExpense(
+  _i8.Future<_i3.ResourceUtil<List<_i10.ExpenseCategoryModel>>> getExpense(
     int? month,
     int? year,
-    String? subCategory,
+    String? subCategoryId,
   ) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -227,44 +224,43 @@ class MockFirestoreRepository extends _i1.Mock
           [
             month,
             year,
-            subCategory,
+            subCategoryId,
           ],
         ),
-        returnValue: _i8.Future<
-                _i3.Either<_i9.Failure, List<_i11.ExpenseCategoryModel>>>.value(
-            _FakeEither_1<_i9.Failure, List<_i11.ExpenseCategoryModel>>(
+        returnValue:
+            _i8.Future<_i3.ResourceUtil<List<_i10.ExpenseCategoryModel>>>.value(
+                _FakeResourceUtil_1<List<_i10.ExpenseCategoryModel>>(
           this,
           Invocation.method(
             #getExpense,
             [
               month,
               year,
-              subCategory,
+              subCategoryId,
             ],
           ),
         )),
-      ) as _i8
-          .Future<_i3.Either<_i9.Failure, List<_i11.ExpenseCategoryModel>>>);
+      ) as _i8.Future<_i3.ResourceUtil<List<_i10.ExpenseCategoryModel>>>);
 
   @override
-  _i8.Future<_i3.Either<_i9.Failure, void>> deleteExpense(String? id) =>
+  _i8.Future<_i3.ResourceUtil<void>> deleteExpense(String? id) =>
       (super.noSuchMethod(
         Invocation.method(
           #deleteExpense,
           [id],
         ),
-        returnValue: _i8.Future<_i3.Either<_i9.Failure, void>>.value(
-            _FakeEither_1<_i9.Failure, void>(
+        returnValue:
+            _i8.Future<_i3.ResourceUtil<void>>.value(_FakeResourceUtil_1<void>(
           this,
           Invocation.method(
             #deleteExpense,
             [id],
           ),
         )),
-      ) as _i8.Future<_i3.Either<_i9.Failure, void>>);
+      ) as _i8.Future<_i3.ResourceUtil<void>>);
 
   @override
-  _i8.Future<_i3.Either<_i9.Failure, void>> updateCategory({
+  _i8.Future<_i3.ResourceUtil<void>> updateCategory({
     required String? categoryId,
     required String? categoryName,
     required int? categoryColor,
@@ -279,8 +275,8 @@ class MockFirestoreRepository extends _i1.Mock
             #categoryColor: categoryColor,
           },
         ),
-        returnValue: _i8.Future<_i3.Either<_i9.Failure, void>>.value(
-            _FakeEither_1<_i9.Failure, void>(
+        returnValue:
+            _i8.Future<_i3.ResourceUtil<void>>.value(_FakeResourceUtil_1<void>(
           this,
           Invocation.method(
             #updateCategory,
@@ -292,28 +288,28 @@ class MockFirestoreRepository extends _i1.Mock
             },
           ),
         )),
-      ) as _i8.Future<_i3.Either<_i9.Failure, void>>);
+      ) as _i8.Future<_i3.ResourceUtil<void>>);
 
   @override
-  _i8.Future<_i3.Either<_i9.Failure, List<_i12.CategoryModel>>> getCategory() =>
+  _i8.Future<_i3.ResourceUtil<List<_i11.CategoryModel>>> getCategory() =>
       (super.noSuchMethod(
         Invocation.method(
           #getCategory,
           [],
         ),
         returnValue:
-            _i8.Future<_i3.Either<_i9.Failure, List<_i12.CategoryModel>>>.value(
-                _FakeEither_1<_i9.Failure, List<_i12.CategoryModel>>(
+            _i8.Future<_i3.ResourceUtil<List<_i11.CategoryModel>>>.value(
+                _FakeResourceUtil_1<List<_i11.CategoryModel>>(
           this,
           Invocation.method(
             #getCategory,
             [],
           ),
         )),
-      ) as _i8.Future<_i3.Either<_i9.Failure, List<_i12.CategoryModel>>>);
+      ) as _i8.Future<_i3.ResourceUtil<List<_i11.CategoryModel>>>);
 
   @override
-  _i8.Future<_i3.Either<_i9.Failure, void>> updateSubCategory({
+  _i8.Future<_i3.ResourceUtil<void>> updateSubCategory({
     required String? subCategoryId,
     required String? categoryName,
     required int? categoryColor,
@@ -328,8 +324,8 @@ class MockFirestoreRepository extends _i1.Mock
             #categoryColor: categoryColor,
           },
         ),
-        returnValue: _i8.Future<_i3.Either<_i9.Failure, void>>.value(
-            _FakeEither_1<_i9.Failure, void>(
+        returnValue:
+            _i8.Future<_i3.ResourceUtil<void>>.value(_FakeResourceUtil_1<void>(
           this,
           Invocation.method(
             #updateSubCategory,
@@ -341,49 +337,49 @@ class MockFirestoreRepository extends _i1.Mock
             },
           ),
         )),
-      ) as _i8.Future<_i3.Either<_i9.Failure, void>>);
+      ) as _i8.Future<_i3.ResourceUtil<void>>);
 
   @override
-  _i8.Future<_i3.Either<_i9.Failure, List<_i7.SubCategoryModel>>>
-      getSubCategory() => (super.noSuchMethod(
-            Invocation.method(
-              #getSubCategory,
-              [],
-            ),
-            returnValue: _i8.Future<
-                    _i3.Either<_i9.Failure, List<_i7.SubCategoryModel>>>.value(
-                _FakeEither_1<_i9.Failure, List<_i7.SubCategoryModel>>(
-              this,
-              Invocation.method(
-                #getSubCategory,
-                [],
-              ),
-            )),
-          ) as _i8.Future<_i3.Either<_i9.Failure, List<_i7.SubCategoryModel>>>);
+  _i8.Future<_i3.ResourceUtil<List<_i7.SubCategoryModel>>> getSubCategory() =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getSubCategory,
+          [],
+        ),
+        returnValue:
+            _i8.Future<_i3.ResourceUtil<List<_i7.SubCategoryModel>>>.value(
+                _FakeResourceUtil_1<List<_i7.SubCategoryModel>>(
+          this,
+          Invocation.method(
+            #getSubCategory,
+            [],
+          ),
+        )),
+      ) as _i8.Future<_i3.ResourceUtil<List<_i7.SubCategoryModel>>>);
 
   @override
-  _i8.Future<_i3.Either<_i9.Failure, List<_i7.SubCategoryModel>>>
+  _i8.Future<_i3.ResourceUtil<List<_i7.SubCategoryModel>>>
       getSubCategoryWithCache() => (super.noSuchMethod(
             Invocation.method(
               #getSubCategoryWithCache,
               [],
             ),
-            returnValue: _i8.Future<
-                    _i3.Either<_i9.Failure, List<_i7.SubCategoryModel>>>.value(
-                _FakeEither_1<_i9.Failure, List<_i7.SubCategoryModel>>(
+            returnValue:
+                _i8.Future<_i3.ResourceUtil<List<_i7.SubCategoryModel>>>.value(
+                    _FakeResourceUtil_1<List<_i7.SubCategoryModel>>(
               this,
               Invocation.method(
                 #getSubCategoryWithCache,
                 [],
               ),
             )),
-          ) as _i8.Future<_i3.Either<_i9.Failure, List<_i7.SubCategoryModel>>>);
+          ) as _i8.Future<_i3.ResourceUtil<List<_i7.SubCategoryModel>>>);
 }
 
 /// A class which mocks [FcmRepository].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockFcmRepository extends _i1.Mock implements _i13.FcmRepository {
+class MockFcmRepository extends _i1.Mock implements _i12.FcmRepository {
   MockFcmRepository() {
     _i1.throwOnMissingStub(this);
   }
@@ -398,28 +394,27 @@ class MockFcmRepository extends _i1.Mock implements _i13.FcmRepository {
       ) as _i4.Client);
 
   @override
-  _i8.Future<_i3.Either<_i9.Failure, bool>> sendFcm(
-          _i14.SendFcmRequest? request) =>
+  _i8.Future<_i3.ResourceUtil<bool>> sendFcm(_i13.SendFcmRequest? request) =>
       (super.noSuchMethod(
         Invocation.method(
           #sendFcm,
           [request],
         ),
-        returnValue: _i8.Future<_i3.Either<_i9.Failure, bool>>.value(
-            _FakeEither_1<_i9.Failure, bool>(
+        returnValue:
+            _i8.Future<_i3.ResourceUtil<bool>>.value(_FakeResourceUtil_1<bool>(
           this,
           Invocation.method(
             #sendFcm,
             [request],
           ),
         )),
-      ) as _i8.Future<_i3.Either<_i9.Failure, bool>>);
+      ) as _i8.Future<_i3.ResourceUtil<bool>>);
 }
 
 /// A class which mocks [AuthRepository].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockAuthRepository extends _i1.Mock implements _i15.AuthRepository {
+class MockAuthRepository extends _i1.Mock implements _i14.AuthRepository {
   MockAuthRepository() {
     _i1.throwOnMissingStub(this);
   }
@@ -443,13 +438,13 @@ class MockAuthRepository extends _i1.Mock implements _i15.AuthRepository {
       ) as _i5.AuthPref);
 
   @override
-  _i8.Stream<_i16.UserModel?> get user => (super.noSuchMethod(
+  _i8.Stream<_i15.UserModel?> get user => (super.noSuchMethod(
         Invocation.getter(#user),
-        returnValue: _i8.Stream<_i16.UserModel?>.empty(),
-      ) as _i8.Stream<_i16.UserModel?>);
+        returnValue: _i8.Stream<_i15.UserModel?>.empty(),
+      ) as _i8.Stream<_i15.UserModel?>);
 
   @override
-  _i8.Future<_i3.Either<_i9.Failure, bool>> register(
+  _i8.Future<_i3.ResourceUtil<bool>> register(
     String? email,
     String? password,
   ) =>
@@ -461,8 +456,8 @@ class MockAuthRepository extends _i1.Mock implements _i15.AuthRepository {
             password,
           ],
         ),
-        returnValue: _i8.Future<_i3.Either<_i9.Failure, bool>>.value(
-            _FakeEither_1<_i9.Failure, bool>(
+        returnValue:
+            _i8.Future<_i3.ResourceUtil<bool>>.value(_FakeResourceUtil_1<bool>(
           this,
           Invocation.method(
             #register,
@@ -472,10 +467,10 @@ class MockAuthRepository extends _i1.Mock implements _i15.AuthRepository {
             ],
           ),
         )),
-      ) as _i8.Future<_i3.Either<_i9.Failure, bool>>);
+      ) as _i8.Future<_i3.ResourceUtil<bool>>);
 
   @override
-  _i8.Future<_i3.Either<_i9.Failure, _i16.UserDataModel>> login(
+  _i8.Future<_i3.ResourceUtil<_i15.UserDataModel>> login(
     String? email,
     String? password,
   ) =>
@@ -487,9 +482,8 @@ class MockAuthRepository extends _i1.Mock implements _i15.AuthRepository {
             password,
           ],
         ),
-        returnValue:
-            _i8.Future<_i3.Either<_i9.Failure, _i16.UserDataModel>>.value(
-                _FakeEither_1<_i9.Failure, _i16.UserDataModel>(
+        returnValue: _i8.Future<_i3.ResourceUtil<_i15.UserDataModel>>.value(
+            _FakeResourceUtil_1<_i15.UserDataModel>(
           this,
           Invocation.method(
             #login,
@@ -499,7 +493,7 @@ class MockAuthRepository extends _i1.Mock implements _i15.AuthRepository {
             ],
           ),
         )),
-      ) as _i8.Future<_i3.Either<_i9.Failure, _i16.UserDataModel>>);
+      ) as _i8.Future<_i3.ResourceUtil<_i15.UserDataModel>>);
 
   @override
   _i8.Future<void> logout() => (super.noSuchMethod(
@@ -512,20 +506,52 @@ class MockAuthRepository extends _i1.Mock implements _i15.AuthRepository {
       ) as _i8.Future<void>);
 
   @override
-  _i8.Future<_i3.Either<_i9.Failure, _i16.UserDataModel>> getUserDataModel() =>
+  _i8.Future<_i3.ResourceUtil<_i15.UserDataModel>> getUserDataModel() =>
       (super.noSuchMethod(
         Invocation.method(
           #getUserDataModel,
           [],
         ),
-        returnValue:
-            _i8.Future<_i3.Either<_i9.Failure, _i16.UserDataModel>>.value(
-                _FakeEither_1<_i9.Failure, _i16.UserDataModel>(
+        returnValue: _i8.Future<_i3.ResourceUtil<_i15.UserDataModel>>.value(
+            _FakeResourceUtil_1<_i15.UserDataModel>(
           this,
           Invocation.method(
             #getUserDataModel,
             [],
           ),
         )),
-      ) as _i8.Future<_i3.Either<_i9.Failure, _i16.UserDataModel>>);
+      ) as _i8.Future<_i3.ResourceUtil<_i15.UserDataModel>>);
+
+  @override
+  _i8.Future<_i3.ResourceUtil<bool>> setIsDarkMode(bool? isDarkMode) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #setIsDarkMode,
+          [isDarkMode],
+        ),
+        returnValue:
+            _i8.Future<_i3.ResourceUtil<bool>>.value(_FakeResourceUtil_1<bool>(
+          this,
+          Invocation.method(
+            #setIsDarkMode,
+            [isDarkMode],
+          ),
+        )),
+      ) as _i8.Future<_i3.ResourceUtil<bool>>);
+
+  @override
+  _i8.Future<_i3.ResourceUtil<bool>> getIsDarkMode() => (super.noSuchMethod(
+        Invocation.method(
+          #getIsDarkMode,
+          [],
+        ),
+        returnValue:
+            _i8.Future<_i3.ResourceUtil<bool>>.value(_FakeResourceUtil_1<bool>(
+          this,
+          Invocation.method(
+            #getIsDarkMode,
+            [],
+          ),
+        )),
+      ) as _i8.Future<_i3.ResourceUtil<bool>>);
 }

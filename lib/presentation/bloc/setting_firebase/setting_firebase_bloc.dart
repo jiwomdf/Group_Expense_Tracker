@@ -3,6 +3,7 @@ import 'package:core/data/pref/firebase_options_pref.dart';
 import 'package:core/domain/model/firebase_options_android_model.dart';
 import 'package:core/domain/model/firebase_options_ios_model.dart';
 import 'package:core/domain/model/firebase_options_web_model.dart';
+import 'package:core/util/resource/resource_util.dart';
 import 'package:equatable/equatable.dart';
 
 part 'setting_firebase_event.dart';
@@ -17,11 +18,19 @@ class SettingFirebaseBloc
     on<GetSettingFirebaseAndroidEvent>((event, emit) async {
       var data = await _firebaseOptionsPref.getFirebaseOptionsModelAndroid();
 
-      data.fold((l) {
-        emit(SettingFirebaseInitial());
-      }, (r) {
-        emit(SettingFirebaseAndroidHasData(r));
-      });
+      switch (data.status) {
+        case Status.success:
+          if (data.data != null) {
+            final nonNullData = data.data as FirebaseOptionsAndroidModel;
+            emit(SettingFirebaseAndroidHasData(nonNullData));
+          } else {
+            emit(SettingFirebaseInitial());
+          }
+          break;
+        case Status.error:
+          emit(SettingFirebaseInitial());
+          break;
+      }
     });
 
     on<SetSettingFirebaseAndroidEvent>((event, emit) async {
@@ -36,11 +45,19 @@ class SettingFirebaseBloc
     on<GetSettingFirebaseIOSEvent>((event, emit) async {
       var data = await _firebaseOptionsPref.getFirebaseOptionsModeliOS();
 
-      data.fold((l) {
-        emit(SettingFirebaseInitial());
-      }, (r) {
-        emit(SettingFirebaseIOSHasData(r));
-      });
+      switch (data.status) {
+        case Status.success:
+          if (data.data != null) {
+            final nonNullData = data.data as FirebaseOptionsIOSModel;
+            emit(SettingFirebaseIOSHasData(nonNullData));
+          } else {
+            emit(SettingFirebaseInitial());
+          }
+          break;
+        case Status.error:
+          emit(SettingFirebaseInitial());
+          break;
+      }
     });
 
     on<SetSettingFirebaseIOSEvent>((event, emit) async {
@@ -55,11 +72,19 @@ class SettingFirebaseBloc
     on<GetSettingFirebaseWebEvent>((event, emit) async {
       var data = await _firebaseOptionsPref.getFirebaseOptionsModelWeb();
 
-      data.fold((l) {
-        emit(SettingFirebaseInitial());
-      }, (r) {
-        emit(SettingFirebaseWebHasData(r));
-      });
+      switch (data.status) {
+        case Status.success:
+          if (data.data != null) {
+            final nonNullData = data.data as FirebaseOptionsWebModel;
+            emit(SettingFirebaseWebHasData(nonNullData));
+          } else {
+            emit(SettingFirebaseInitial());
+          }
+          break;
+        case Status.error:
+          emit(SettingFirebaseInitial());
+          break;
+      }
     });
 
     on<SetSettingFirebaseWebEvent>((event, emit) async {

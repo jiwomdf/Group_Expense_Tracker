@@ -4,6 +4,7 @@ import 'package:core/data/pref/firebase_options_pref.dart';
 import 'package:core/domain/model/firebase_options_android_model.dart';
 import 'package:core/domain/model/firebase_options_ios_model.dart';
 import 'package:core/domain/model/firebase_options_web_model.dart';
+import 'package:core/util/resource/resource_util.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/foundation.dart';
@@ -17,28 +18,43 @@ Future<bool> initFirebase() async {
 
   if (PlatformUtil.isAndroid()) {
     final fAndroid = await firebaseOptionsPref.getFirebaseOptionsModelAndroid();
-    await fAndroid.fold(
-      (l) async => {},
-      (r) async => {
-        isAlreadyInit = await initAndroid(r),
-      },
-    );
+
+    switch (fAndroid.status) {
+      case Status.success:
+        if (fAndroid.data != null) {
+          final nonNullValue = fAndroid.data as FirebaseOptionsAndroidModel;
+          isAlreadyInit = await initAndroid(nonNullValue);
+        }
+        break;
+      case Status.error:
+        break;
+    }
   } else if (PlatformUtil.isIOS()) {
     final fIos = await firebaseOptionsPref.getFirebaseOptionsModeliOS();
-    await fIos.fold(
-      (l) async => {},
-      (r) async => {
-        isAlreadyInit = await initIos(r),
-      },
-    );
+
+    switch (fIos.status) {
+      case Status.success:
+        if (fIos.data != null) {
+          final nonNullValue = fIos.data as FirebaseOptionsIOSModel;
+          isAlreadyInit = await initIos(nonNullValue);
+        }
+        break;
+      case Status.error:
+        break;
+    }
   } else if (kIsWeb) {
     final fWeb = await firebaseOptionsPref.getFirebaseOptionsModelWeb();
-    await fWeb.fold(
-      (l) async => {},
-      (r) async => {
-        isAlreadyInit = await initWeb(r),
-      },
-    );
+
+    switch (fWeb.status) {
+      case Status.success:
+        if (fWeb.data != null) {
+          final nonNullValue = fWeb.data as FirebaseOptionsWebModel;
+          isAlreadyInit = await initWeb(nonNullValue);
+        }
+        break;
+      case Status.error:
+        break;
+    }
   }
 
   return isAlreadyInit;

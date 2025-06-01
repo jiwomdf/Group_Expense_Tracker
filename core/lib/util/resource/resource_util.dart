@@ -1,6 +1,6 @@
 import 'package:core/domain/model/failure.dart';
 
-enum Status { success, error, loading }
+enum Status { success, error }
 
 class ResourceUtil<T> {
   final Status status;
@@ -13,6 +13,4 @@ class ResourceUtil<T> {
       ResourceUtil._(Status.success, data, null);
   factory ResourceUtil.error(Failure? failure, [T? data]) =>
       ResourceUtil._(Status.error, data, failure);
-
-  factory ResourceUtil.loading() => ResourceUtil._(Status.loading, null, null);
 }
