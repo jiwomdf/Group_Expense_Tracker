@@ -3,9 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:group_expense_tracker/di/bloc_injection.dart' as di;
 import 'package:group_expense_tracker/presentation/bloc/budget/budget_bloc.dart';
-import 'package:group_expense_tracker/presentation/bloc/expense/expense_bloc.dart';
 import 'package:group_expense_tracker/presentation/widget/text_form_field.dart';
-import 'package:group_expense_tracker/util/ext/date_format_util.dart';
 import 'package:group_expense_tracker/util/ext/int_util.dart';
 import 'package:group_expense_tracker/util/ext/string_util.dart';
 import 'package:group_expense_tracker/util/ext/text_util.dart';
@@ -39,17 +37,8 @@ class _BudgetPageState extends State<BudgetPage> {
 
   @override
   Widget build(BuildContext context) {
-    final now = DateTime.now();
-
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(
-            create: (_) =>
-                di.locator<BudgetBloc>()..add(const GetBudgetEvent())),
-        BlocProvider(
-            create: (_) => di.locator<ExpenseBloc>()
-              ..add(GetExpenseEvent(now.month, now.year, ""))),
-      ],
+    return BlocProvider(
+      create: (_) => di.locator<BudgetBloc>()..add(const GetBudgetEvent()),
       child: Scaffold(
         appBar: AppBar(title: const Text("Monthly Budget")),
         body: SafeArea(
@@ -78,90 +67,13 @@ class _BudgetPageState extends State<BudgetPage> {
               return SingleChildScrollView(
                 child: Padding(
                   padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _summaryCard(context, now, budget),
-                      const SizedBox(height: 24),
-                      _form(context, budget),
-                    ],
-                  ),
+                  child: _form(context, budget),
                 ),
               );
             },
           ),
         ),
       ),
-    );
-  }
-
-  /// Spending for the current month comes from the same expense bloc the
-  /// dashboard uses, so the two can never disagree.
-  Widget _summaryCard(BuildContext context, DateTime now, int budget) {
-    return BlocBuilder<ExpenseBloc, ExpenseState>(
-      builder: (context, state) {
-        final isLoading = state is ExpenseLoading;
-        var spent = 0;
-        if (state is ExpenseHasData) {
-          for (var expense in state.result) {
-            spent += expense.price;
-          }
-        }
-
-        final remaining = budget - spent;
-        final isOverBudget = budget > 0 && remaining < 0;
-        final progress = budget > 0 ? (spent / budget).clamp(0.0, 1.0) : 0.0;
-
-        return Container(
-          width: double.infinity,
-          decoration: BoxDecoration(
-            borderRadius: const BorderRadius.all(Radius.circular(20)),
-            color: Theme.of(context).cardColor,
-          ),
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(now.toDateString("MMMM yyyy") ?? "",
-                  style: TextUtil(context)
-                      .urbanist(fontSize: 18, fontWeight: FontWeight.w700)),
-              const SizedBox(height: 12),
-              if (isLoading)
-                const LinearProgressIndicator()
-              else ...[
-                Text("Spent Rp. ${spent.toRupiah()}",
-                    style: TextUtil(context)
-                        .urbanist(fontSize: 16, fontWeight: FontWeight.w600)),
-                const SizedBox(height: 8),
-                if (budget > 0) ...[
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: LinearProgressIndicator(
-                      value: progress,
-                      minHeight: 10,
-                      color:
-                          isOverBudget ? AppColors.red.primary : Colors.green,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                      isOverBudget
-                          ? "Over budget by Rp. ${(-remaining).toRupiah()}"
-                          : "Rp. ${remaining.toRupiah()} left of Rp. ${budget.toRupiah()}",
-                      style: TextUtil(context).plusJakarta(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                        color: isOverBudget ? AppColors.red.primary : null,
-                      )),
-                ] else
-                  Text("No monthly budget set yet",
-                      style: TextUtil(context).plusJakarta(
-                          fontSize: 13, fontWeight: FontWeight.w500)),
-              ],
-            ],
-          ),
-        );
-      },
     );
   }
 

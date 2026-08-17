@@ -54,7 +54,6 @@ dev_dependencies:
   flutter_lints: ^3.0.0
   bloc_test: ^9.0.0
   mockito: ^5.0.8
-  analyzer: ^6.4.1
   intl_utils: ^2.8.7
 
 flutter:
