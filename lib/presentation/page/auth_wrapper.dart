@@ -1,4 +1,4 @@
-import 'package:core/domain/model/user_model.dart';
+import 'package:core/domain/model/auth_state.dart';
 import 'package:flutter/material.dart';
 import 'package:group_expense_tracker/presentation/page/home/home_page.dart';
 import 'package:group_expense_tracker/presentation/page/login/login_page.dart';
@@ -13,11 +13,15 @@ class AuthWrapper extends StatelessWidget {
   }
 
   Widget wrapper(BuildContext context) {
-    final user = Provider.of<UserModel?>(context);
-    if (user == null) {
-      return const LoginPage();
-    } else {
+    final authState = Provider.of<AuthState>(context);
+    if (!authState.isResolved) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+    if (authState.isAuthenticated) {
       return const HomePage();
     }
+    return const LoginPage();
   }
 }

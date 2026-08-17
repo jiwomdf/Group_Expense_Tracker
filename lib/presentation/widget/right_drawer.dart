@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:group_expense_tracker/app/apps/app_home.dart';
+import 'package:group_expense_tracker/presentation/bloc/budget/budget_bloc.dart';
 import 'package:group_expense_tracker/presentation/bloc/logout/logout_bloc.dart';
 import 'package:group_expense_tracker/presentation/bloc/usermodel/userdatamodel_bloc.dart';
+import 'package:group_expense_tracker/presentation/page/budget/budget_page.dart';
 import 'package:group_expense_tracker/presentation/page/home/widget/profile_widget.dart';
 import 'package:group_expense_tracker/util/ext/text_util.dart';
 import 'package:group_expense_tracker/util/style/app_color_util.dart';
@@ -63,6 +65,8 @@ class _RightDrawerState extends State<RightDrawer> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      _heading("Budget"),
+                      _budget(context),
                       _heading("Data Management"),
                       _exportData(context),
                       _heading("Setting Firebase"),
@@ -118,6 +122,37 @@ class _RightDrawerState extends State<RightDrawer> {
                 child: Icon(Icons.settings),
               ),
               Text("Setting Firebase",
+                  style: TextUtil(context)
+                      .urbanist(fontSize: 16, fontWeight: FontWeight.w600)),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Padding _budget(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10, top: 10, left: 10),
+      child: InkWell(
+        onTap: () async {
+          await Navigator.pushNamed(context, BudgetPage.routeName);
+          // The page edits its own bloc instance, so the dashboard card has to
+          // re-read the saved amount once the user comes back.
+          if (context.mounted) {
+            context.read<BudgetBloc>().add(const GetBudgetEvent());
+          }
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              const Padding(
+                padding: EdgeInsets.only(right: 4),
+                child: Icon(Icons.savings_outlined),
+              ),
+              Text("Monthly Budget",
                   style: TextUtil(context)
                       .urbanist(fontSize: 16, fontWeight: FontWeight.w600)),
             ],

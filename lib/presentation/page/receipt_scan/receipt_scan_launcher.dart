@@ -1,9 +1,15 @@
-/// Mobile-only entry point for receipt scanning.
-///
-/// ML Kit's Dart code imports `dart:io`, so anything that reaches
-/// `ReceiptScanPage` fails to compile for web. Callers import this file and get
-/// the real scanner on Android and iOS, or a no-op on web.
-library;
+import 'package:core/domain/model/receipt_scan_model.dart';
+import 'package:flutter/material.dart';
+import 'package:group_expense_tracker/presentation/page/receipt_scan/receipt_scan_page.dart';
 
-export 'receipt_scan_launcher_stub.dart'
-    if (dart.library.io) 'receipt_scan_launcher_io.dart';
+/// Opens the scanner and returns what the user accepted, or null if they backed
+/// out without scanning.
+///
+/// Pushed directly instead of by route name so the parsed result can come back
+/// through `Navigator.pop`. Works on every platform now that the OCR engine is
+/// chosen behind `ReceiptScanner`.
+Future<ReceiptScanModel?> openReceiptScanner(BuildContext context) {
+  return Navigator.of(context).push<ReceiptScanModel>(
+    MaterialPageRoute(builder: (_) => const ReceiptScanPage()),
+  );
+}

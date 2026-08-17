@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:group_expense_tracker/app/apps/app_home.dart';
 import 'package:group_expense_tracker/di/bloc_injection.dart' as di;
 import 'package:group_expense_tracker/generated/l10n.dart';
+import 'package:group_expense_tracker/presentation/bloc/budget/budget_bloc.dart';
 import 'package:group_expense_tracker/presentation/bloc/expense/expense_bloc.dart';
 import 'package:group_expense_tracker/presentation/bloc/subcategory/subcategory_bloc.dart';
 import 'package:group_expense_tracker/presentation/page/expense_form/expense_form_page.dart';
@@ -59,6 +60,9 @@ class _HomePageState extends State<HomePage> {
             create: (_) => di.locator<ExpenseBloc>()
               ..add(GetExpenseEvent(
                   DateTime.now().month, DateTime.now().year, ""))),
+        BlocProvider(
+            create: (_) =>
+                di.locator<BudgetBloc>()..add(const GetBudgetEvent())),
       ],
       child: BlocBuilder<ExpenseBloc, ExpenseState>(
         builder: (context, state) {
@@ -69,8 +73,11 @@ class _HomePageState extends State<HomePage> {
             floatingActionButton: Column(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                // Receipt scanning relies on ML Kit, which is Android/iOS only.
-                if (PlatformUtil.isAndroid() || PlatformUtil.isIOS())
+                // Every platform has an OCR engine now: ML Kit on mobile,
+                // Tesseract.js in the browser.
+                if (PlatformUtil.isAndroid() ||
+                    PlatformUtil.isIOS() ||
+                    PlatformUtil.isWeb())
                   Padding(
                     padding: const EdgeInsets.only(bottom: 12),
                     child: FloatingActionButton(

@@ -35,6 +35,12 @@
 </head>
 
 <body>
+  <!-- OCR engine for the web build. ML Kit is mobile only, so the browser uses
+       Tesseract.js instead; see lib/data/ocr/receipt_scanner_web.dart.
+       Served from web/tesseract/ rather than a CDN, so scanning keeps working
+       offline and depends on nobody else staying up. The scanner reports a
+       clear error if this script is missing. -->
+  <script src="tesseract/tesseract.min.js"></script>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 

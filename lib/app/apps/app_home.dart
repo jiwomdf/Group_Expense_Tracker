@@ -1,4 +1,4 @@
-import 'package:core/domain/model/user_model.dart';
+import 'package:core/domain/model/auth_state.dart';
 import 'package:core/repository/auth_repository.dart';
 import 'package:core/util/resource/resource_util.dart';
 import 'package:flutter/material.dart';
@@ -30,7 +30,10 @@ class AppHome extends StatefulWidget {
 class AppHomeState extends State<AppHome> {
   ThemeMode _themeMode = ThemeMode.light;
   final _getIt = GetIt.instance;
-  late final Stream<UserModel?> _userStream = _getIt<AuthRepository>().user;
+  late final Stream<AuthState> _authStream = _getIt<AuthRepository>().user.map(
+      (user) => user != null
+          ? AuthState.authenticated(user)
+          : const AuthState.unauthenticated());
 
   ThemeMode get themeMode => _themeMode;
 
@@ -40,9 +43,9 @@ class AppHomeState extends State<AppHome> {
         ? SystemUiOverlayStyle.dark
         : SystemUiOverlayStyle.light);
 
-    return StreamProvider<UserModel?>.value(
-        value: _userStream,
-        initialData: null,
+    return StreamProvider<AuthState>.value(
+        value: _authStream,
+        initialData: const AuthState.unknown(),
         child: MultiProvider(
           providers: [
             BlocProvider(create: (_) => di.locator<UserDataModelBloc>()),

@@ -1,14 +1,14 @@
 import 'package:core/domain/model/receipt_scan_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:group_expense_tracker/data/repository/receipt_scan_repository.dart';
+import 'package:group_expense_tracker/data/ocr/receipt_scanner.dart';
 import 'package:group_expense_tracker/presentation/bloc/receipt_scan/receipt_scan_bloc.dart';
 import 'package:group_expense_tracker/util/ext/date_format_util.dart';
 import 'package:group_expense_tracker/util/ext/int_util.dart';
 import 'package:group_expense_tracker/util/ext/text_util.dart';
 import 'package:group_expense_tracker/util/style/app_snackbar_util.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:universal_io/io.dart';
+import 'package:group_expense_tracker/util/platform_util.dart';
 
 /// Photographs a receipt, reads it with on-device OCR, and pops the parsed
 /// result back to the caller.
@@ -31,14 +31,14 @@ class ReceiptScanPage extends StatefulWidget {
 class _ReceiptScanPageState extends State<ReceiptScanPage> {
   /// Built here rather than through GetIt so the ML Kit recogniser is released
   /// as soon as the user leaves this page.
-  final _repository = ReceiptScanRepository();
+  final _scanner = ReceiptScanner();
   final _picker = ImagePicker();
-  late final ReceiptScanBloc _bloc = ReceiptScanBloc(_repository);
+  late final ReceiptScanBloc _bloc = ReceiptScanBloc(_scanner);
 
   @override
   void dispose() {
     _bloc.close();
-    _repository.close();
+    _scanner.close();
     super.dispose();
   }
 
@@ -55,7 +55,7 @@ class _ReceiptScanPageState extends State<ReceiptScanPage> {
       _bloc.add(ScanReceiptEvent(image.path));
     } catch (e) {
       if (!mounted) return;
-      final target = source == ImageSource.camera ? "camera" : "photo library";
+      final target = source == ImageSource.camera ? "camera" : "file picker";
       context.show("Could not open the $target: $e");
     }
   }
@@ -98,36 +98,47 @@ class _ReceiptScanPageState extends State<ReceiptScanPage> {
           Padding(
             padding: const EdgeInsets.only(top: 24, bottom: 8),
             child: Text(
-              "Photograph your receipt",
+              PlatformUtil.isWeb()
+                  ? "Upload your receipt"
+                  : "Photograph your receipt",
               style: TextUtil(context)
                   .plusJakarta(fontSize: 18, fontWeight: FontWeight.w600),
             ),
           ),
           Text(
-            "Lay it flat, fill the frame, and keep the total visible. The text is read on your device, nothing is uploaded.",
+            PlatformUtil.isWeb()
+                ? "Pick a photo or scan of your receipt. The text is read in your browser, the image is never uploaded."
+                : "Lay it flat, fill the frame, and keep the total visible. The text is read on your device, nothing is uploaded.",
             textAlign: TextAlign.center,
             style: TextUtil(context)
                 .plusJakarta(fontSize: 12, fontWeight: FontWeight.w500),
           ),
-          Padding(
-            padding: const EdgeInsets.only(top: 32),
-            child: SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                onPressed: () => _pick(ImageSource.camera),
-                icon: const Icon(Icons.photo_camera),
-                label: const Text("Take a photo"),
+          // The browser has no camera flow worth offering here, so web uploads
+          // a file instead.
+          if (!PlatformUtil.isWeb())
+            Padding(
+              padding: const EdgeInsets.only(top: 32),
+              child: SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () => _pick(ImageSource.camera),
+                  icon: const Icon(Icons.photo_camera),
+                  label: const Text("Take a photo"),
+                ),
               ),
             ),
-          ),
           Padding(
-            padding: const EdgeInsets.only(top: 12),
+            padding: EdgeInsets.only(top: PlatformUtil.isWeb() ? 32 : 12),
             child: SizedBox(
               width: double.infinity,
               child: OutlinedButton.icon(
                 onPressed: () => _pick(ImageSource.gallery),
-                icon: const Icon(Icons.photo_library),
-                label: const Text("Choose from gallery"),
+                icon: Icon(PlatformUtil.isWeb()
+                    ? Icons.upload_file
+                    : Icons.photo_library),
+                label: Text(PlatformUtil.isWeb()
+                    ? "Upload a receipt"
+                    : "Choose from gallery"),
               ),
             ),
           ),
@@ -146,11 +157,16 @@ class _ReceiptScanPageState extends State<ReceiptScanPage> {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(8),
-              child: Image.file(
-                File(imagePath),
+              // image_picker hands back a blob: URL on web and a file path on
+              // mobile, and Image.network reads both.
+              child: Image.network(
+                PlatformUtil.isWeb()
+                    ? imagePath
+                    : Uri.file(imagePath).toString(),
                 height: 180,
                 width: double.infinity,
                 fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => const SizedBox(height: 180),
               ),
             ),
             Padding(

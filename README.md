@@ -19,6 +19,7 @@ https://group-expense-tracker.web.app/ <br /><br />
 - Insert data can be together as group
 - Modify firestore scheme
 - Export to Json and Spread Sheets
+- Monthly budget, stored on the device only
 - Light and Dark theme <br /><br />
 
 

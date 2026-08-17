@@ -1,5 +1,6 @@
 import 'package:core/util/poultry_registery.dart';
 import 'package:get_it/get_it.dart';
+import 'package:group_expense_tracker/presentation/bloc/budget/budget_bloc.dart';
 import 'package:group_expense_tracker/presentation/bloc/category/category_bloc.dart';
 import 'package:group_expense_tracker/presentation/bloc/expense/expense_bloc.dart';
 import 'package:group_expense_tracker/presentation/bloc/fcm/fcm_bloc.dart';
@@ -25,4 +26,5 @@ Future<void> init() async {
   PoultryRegistry.safeRegisterFactory<SubcategoryBloc>(
       () => SubcategoryBloc(locator()));
   PoultryRegistry.safeRegisterSingleton<FcmBloc>(FcmBloc(locator()));
+  PoultryRegistry.safeRegisterFactory<BudgetBloc>(() => BudgetBloc(locator()));
 }
