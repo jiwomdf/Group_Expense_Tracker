@@ -45,5 +45,9 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Used to photograph receipts so their total can be read into an expense.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Used to pick a receipt photo so its total can be read into an expense.</string>
 </dict>
 </plist>

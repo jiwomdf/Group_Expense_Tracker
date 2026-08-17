@@ -32,7 +32,6 @@ class FcmNotification {
       };
 }
 
-
 /**
      *  {
         "to": "YOUR_FCM_TOEKEN",

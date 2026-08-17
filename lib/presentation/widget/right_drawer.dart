@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:group_expense_tracker/app/apps/app_home.dart';
 import 'package:group_expense_tracker/presentation/bloc/logout/logout_bloc.dart';
 import 'package:group_expense_tracker/presentation/bloc/usermodel/userdatamodel_bloc.dart';
-import 'package:group_expense_tracker/presentation/page/holiday/holiday_page.dart';
 import 'package:group_expense_tracker/presentation/page/home/widget/profile_widget.dart';
 import 'package:group_expense_tracker/util/ext/text_util.dart';
 import 'package:group_expense_tracker/util/style/app_color_util.dart';
@@ -64,8 +63,6 @@ class _RightDrawerState extends State<RightDrawer> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _heading("Features"),
-                      _holiday(context),
                       _heading("Data Management"),
                       _exportData(context),
                       _heading("Setting Firebase"),
@@ -264,32 +261,6 @@ class _RightDrawerState extends State<RightDrawer> {
           "Version ${VersionUtil.version}",
           style: TextStyle(color: AppColors.grey.lightGray),
           textAlign: TextAlign.center,
-        ),
-      ),
-    );
-  }
-
-  _holiday(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10, top: 10, left: 10),
-      child: InkWell(
-        onTap: () {
-          Navigator.pushNamed(context, HolidayPage.routeName);
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              const Padding(
-                padding: EdgeInsets.only(right: 4),
-                child: Icon(Icons.sports_baseball_outlined),
-              ),
-              Text("Holiday",
-                  style: TextUtil(context)
-                      .urbanist(fontSize: 16, fontWeight: FontWeight.w600)),
-            ],
-          ),
         ),
       ),
     );

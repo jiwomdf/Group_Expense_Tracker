@@ -19,7 +19,6 @@ https://group-expense-tracker.web.app/ <br /><br />
 - Insert data can be together as group
 - Modify firestore scheme
 - Export to Json and Spread Sheets
-- Holiday Information
 - Light and Dark theme <br /><br />
 
 

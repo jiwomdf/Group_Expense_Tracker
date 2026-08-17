@@ -78,11 +78,15 @@ class FirestoreRepository {
 
       for (var i = 0; i < listExpenseRequest.length; i++) {
         var expense = listExpenseRequest[i];
-        await Future.delayed(const Duration(milliseconds: 500));
+        // Stamped here rather than by the caller, matching insertExpense, so
+        // batched rows record who added them too.
+        expense.email ??= firebaseAuth.currentUser?.email;
         batch.set(_expenseCollection.doc(), expense.toJson());
       }
 
-      batch.commit();
+      // Awaited so a rejected commit surfaces as an error instead of being
+      // reported as a success the caller then acts on.
+      await batch.commit();
       return ResourceUtil.success(null);
     } catch (ex) {
       return ResourceUtil.error(ServerFailure(ex.toString()));
@@ -305,6 +309,10 @@ class FirestoreRepository {
           SubCategoryConstants.email: firebaseAuth.currentUser?.email ?? '',
         },
       );
+      // The cache is now behind the server, so drop it and let the next
+      // getSubCategoryWithCache call refetch. Without this a newly added
+      // subcategory stays invisible until the app restarts.
+      subCategoryCache = [];
       return ResourceUtil.success(null);
     } catch (ex) {
       return ResourceUtil.error(ServerFailure(ex.toString()));

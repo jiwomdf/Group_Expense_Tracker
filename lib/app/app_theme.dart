@@ -7,7 +7,7 @@ final ThemeData defaultThemeData = ThemeData(
   scaffoldBackgroundColor: AppColors.white.primary,
   cardColor: AppColors.purple.bgLightPurple,
   canvasColor: AppColors.purple.bgLightPurple,
-  dialogTheme: DialogTheme(backgroundColor: AppColors.white.primary),
+  dialogTheme: DialogThemeData(backgroundColor: AppColors.white.primary),
 );
 
 final ThemeData darkThemeData = ThemeData.dark(

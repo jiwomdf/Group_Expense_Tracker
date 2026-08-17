@@ -4,7 +4,6 @@ import 'package:group_expense_tracker/presentation/page/expense_form/expense_for
 import 'package:group_expense_tracker/presentation/page/export_expense/export_expense_json_page.dart';
 import 'package:group_expense_tracker/presentation/page/export_expense/export_expense_page.dart';
 import 'package:group_expense_tracker/presentation/page/export_expense/export_expense_sheet_page.dart';
-import 'package:group_expense_tracker/presentation/page/holiday/holiday_page.dart';
 import 'package:group_expense_tracker/presentation/page/home/home_page.dart';
 import 'package:group_expense_tracker/presentation/page/import_expense/import_expense_page.dart';
 import 'package:group_expense_tracker/presentation/page/login/login_page.dart';
@@ -30,10 +29,8 @@ PageRoute router(RouteSettings settings) {
       return MaterialPageRoute(builder: (_) => const ExportExpenseSheetPage());
     case UpdateTablePage.routeName:
       return MaterialPageRoute(builder: (_) => const UpdateTablePage());
-    case HolidayPage.routeName:
-      return MaterialPageRoute(builder: (_) => const HolidayPage());
     case SettingFirebasePage.routeName:
-      return MaterialPageRoute(builder: (_) => const HolidayPage());
+      return MaterialPageRoute(builder: (_) => const SettingFirebasePage());
     case ExpenseFormPage.routeName:
       return MaterialPageRoute(
           settings: settings,

@@ -12,11 +12,13 @@ class AuthRepository {
 
   AuthRepository({required this.firebaseAuth, required this.authPref});
 
-  Stream<UserModel?> get user {
-    return firebaseAuth.authStateChanges().map((User? user) {
-      return user != null ? UserModel(uid: user.uid) : null;
-    });
-  }
+  /// Built once and cached, so every caller gets the same stream instance.
+  /// Returning a new stream on each access makes StreamProvider resubscribe
+  /// and fall back to its initial data on every rebuild.
+  late final Stream<UserModel?> user =
+      firebaseAuth.authStateChanges().map((User? user) {
+    return user != null ? UserModel(uid: user.uid) : null;
+  }).asBroadcastStream();
 
   Future<ResourceUtil<bool>> register(String email, String password) async {
     try {

@@ -30,17 +30,18 @@ class AppHome extends StatefulWidget {
 class AppHomeState extends State<AppHome> {
   ThemeMode _themeMode = ThemeMode.light;
   final _getIt = GetIt.instance;
+  late final Stream<UserModel?> _userStream = _getIt<AuthRepository>().user;
+
+  ThemeMode get themeMode => _themeMode;
 
   @override
   Widget build(BuildContext context) {
-    WidgetsFlutterBinding.ensureInitialized();
-
     SystemChrome.setSystemUIOverlayStyle(_themeMode == ThemeMode.light
         ? SystemUiOverlayStyle.dark
         : SystemUiOverlayStyle.light);
 
     return StreamProvider<UserModel?>.value(
-        value: _getIt<AuthRepository>().user,
+        value: _userStream,
         initialData: null,
         child: MultiProvider(
           providers: [
@@ -53,8 +54,11 @@ class AppHomeState extends State<AppHome> {
   }
 
   void changeTheme(ThemeMode themeMode) async {
+    if (themeMode == _themeMode) return;
+
     final isDarkMode = themeMode == ThemeMode.dark;
     await di.locator<AuthRepository>().setIsDarkMode(isDarkMode);
+    if (!mounted) return;
     setState(() {
       _themeMode = themeMode;
     });

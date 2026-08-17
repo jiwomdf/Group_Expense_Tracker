@@ -11,6 +11,19 @@ import 'package:group_expense_tracker/presentation/widget/text_form_field.dart';
 import 'package:group_expense_tracker/util/ext/text_util.dart';
 import 'package:group_expense_tracker/util/platform_util.dart';
 
+/// Pre loaded data taken from the google-services.json of the
+/// `money-expanse-lidya-s` firebase project, so the user does not have to
+/// type every field manually.
+class _FirebaseOptionsPreload {
+  static const apiKey = "AIzaSyDbHjguTqUQTAcoe0Tv49lBDFSlh84wmJE";
+  static const androidAppId = "1:543633010470:android:0f1d7f9f97bb305537dbe7";
+  static const messagingSenderId = "543633010470";
+  static const projectId = "money-expanse-lidya-s";
+  static const storageBucket = "money-expanse-lidya-s.appspot.com";
+  static const authDomain = "money-expanse-lidya-s.firebaseapp.com";
+  static const packageName = "com.programmergabut.lidya_group_expan";
+}
+
 class SettingFirebasePage extends StatefulWidget {
   static const routeName = '/setting-firebase-page';
   const SettingFirebasePage({super.key});
@@ -87,6 +100,12 @@ class _SettingFirebasePageState extends State<SettingFirebasePage> {
     TextEditingController projectIdController = TextEditingController();
     TextEditingController storageBucketController = TextEditingController();
     firebaseNameController.text = defaultFirebaseAppName;
+    apiKeyController.text = _FirebaseOptionsPreload.apiKey;
+    appIdController.text = _FirebaseOptionsPreload.androidAppId;
+    messagingSenderIdController.text =
+        _FirebaseOptionsPreload.messagingSenderId;
+    projectIdController.text = _FirebaseOptionsPreload.projectId;
+    storageBucketController.text = _FirebaseOptionsPreload.storageBucket;
 
     return BlocBuilder<SettingFirebaseBloc, SettingFirebaseState>(
       builder: (context, state) {
@@ -192,6 +211,12 @@ class _SettingFirebasePageState extends State<SettingFirebasePage> {
     TextEditingController storageBucketController = TextEditingController();
     TextEditingController iosBundleIdController = TextEditingController();
     firebaseNameController.text = defaultFirebaseAppName;
+    apiKeyController.text = _FirebaseOptionsPreload.apiKey;
+    messagingSenderIdController.text =
+        _FirebaseOptionsPreload.messagingSenderId;
+    projectIdController.text = _FirebaseOptionsPreload.projectId;
+    storageBucketController.text = _FirebaseOptionsPreload.storageBucket;
+    iosBundleIdController.text = _FirebaseOptionsPreload.packageName;
 
     return BlocBuilder<SettingFirebaseBloc, SettingFirebaseState>(
       builder: (context, state) {
@@ -305,6 +330,12 @@ class _SettingFirebasePageState extends State<SettingFirebasePage> {
     TextEditingController appIdController = TextEditingController();
     TextEditingController measurementIdController = TextEditingController();
     firebaseNameController.text = defaultFirebaseAppName;
+    apiKeyController.text = _FirebaseOptionsPreload.apiKey;
+    authDomainController.text = _FirebaseOptionsPreload.authDomain;
+    projectIdController.text = _FirebaseOptionsPreload.projectId;
+    storageBucketController.text = _FirebaseOptionsPreload.storageBucket;
+    messagingSenderIdController.text =
+        _FirebaseOptionsPreload.messagingSenderId;
 
     return BlocBuilder<SettingFirebaseBloc, SettingFirebaseState>(
       builder: (context, state) {

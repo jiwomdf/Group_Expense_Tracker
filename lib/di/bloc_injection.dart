@@ -3,7 +3,6 @@ import 'package:get_it/get_it.dart';
 import 'package:group_expense_tracker/presentation/bloc/category/category_bloc.dart';
 import 'package:group_expense_tracker/presentation/bloc/expense/expense_bloc.dart';
 import 'package:group_expense_tracker/presentation/bloc/fcm/fcm_bloc.dart';
-import 'package:group_expense_tracker/presentation/bloc/holidays/holiday_bloc.dart';
 import 'package:group_expense_tracker/presentation/bloc/login/login_bloc.dart';
 import 'package:group_expense_tracker/presentation/bloc/logout/logout_bloc.dart';
 import 'package:group_expense_tracker/presentation/bloc/register/register_bloc.dart';
@@ -26,6 +25,4 @@ Future<void> init() async {
   PoultryRegistry.safeRegisterFactory<SubcategoryBloc>(
       () => SubcategoryBloc(locator()));
   PoultryRegistry.safeRegisterSingleton<FcmBloc>(FcmBloc(locator()));
-  PoultryRegistry.safeRegisterFactory<HolidayBloc>(
-      () => HolidayBloc(locator()));
 }

@@ -35,6 +35,7 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
 
       switch (expenses.status) {
         case Status.success:
+          emit(const ExpenseDataChanged(true));
           break;
         case Status.error:
           emit(ExpenseError(expenses.failure?.message ?? ""));
@@ -91,7 +92,7 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
       switch (expenses.status) {
         case Status.success:
           _tempExpense = expenses.data ?? [];
-          emit(ExpenseHasData(expenses.data ?? []));
+          emit(_dataOrEmpty(_tempExpense));
           break;
         case Status.error:
           emit(ExpenseError(expenses.failure?.message ?? ""));
@@ -105,7 +106,7 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
       switch (expenses.status) {
         case Status.success:
           _tempExpense = expenses.data ?? [];
-          emit(ExpenseHasData(expenses.data ?? []));
+          emit(_dataOrEmpty(_tempExpense));
           break;
         case Status.error:
           emit(ExpenseError(expenses.failure?.message ?? ""));
@@ -123,7 +124,7 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
           var isExactYear = paramDate.year == iDate.year;
           return isExactMonth && isExactYear;
         }).toList();
-        emit(ExpenseHasData(filteredExpense));
+        emit(_dataOrEmpty(filteredExpense));
       } catch (ex) {
         emit(ExpenseError(ex.toString()));
       }
@@ -133,4 +134,10 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
       emit(ExpenseInitiated());
     });
   }
+
+  /// `ExpenseEmpty` exists so the dashboard can tell "no expenses recorded"
+  /// apart from "expenses loaded", instead of rendering charts and totals over
+  /// an empty list.
+  ExpenseState _dataOrEmpty(List<ExpenseCategoryModel> expenses) =>
+      expenses.isEmpty ? const ExpenseEmpty() : ExpenseHasData(expenses);
 }
