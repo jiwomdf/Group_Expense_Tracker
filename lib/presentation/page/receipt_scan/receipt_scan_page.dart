@@ -182,31 +182,9 @@ class _ReceiptScanPageState extends State<ReceiptScanPage> {
                 "Date",
                 result.date?.toDateString(DateFormatUtil.ddMMMyyyy) ??
                     "not found, today will be used"),
-            Padding(
-              padding: const EdgeInsets.only(top: 8),
-              child: Theme(
-                data: Theme.of(context)
-                    .copyWith(dividerColor: Colors.transparent),
-                child: ExpansionTile(
-                  tilePadding: EdgeInsets.zero,
-                  title: Text(
-                    "Show full text",
-                    style: TextUtil(context)
-                        .plusJakarta(fontSize: 12, fontWeight: FontWeight.w600),
-                  ),
-                  children: [
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        result.rawText,
-                        style: const TextStyle(
-                            fontSize: 11, fontFamily: 'monospace'),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            _monospaceExpander(context, "Show full text", result.rawText),
+            _monospaceExpander(
+                context, "Show process log", result.log.join('\n')),
             Padding(
               padding: const EdgeInsets.only(top: 24),
               child: SizedBox(
@@ -225,6 +203,36 @@ class _ReceiptScanPageState extends State<ReceiptScanPage> {
                   onPressed: () => _bloc.add(const ResetReceiptScanEvent()),
                   child: const Text("Scan again"),
                 ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Both the raw OCR dump and the stage trace read like console output, so
+  /// they share one collapsed monospace panel.
+  Widget _monospaceExpander(BuildContext context, String title, String body) {
+    if (body.trim().isEmpty) return const SizedBox();
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: Theme(
+        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+        child: ExpansionTile(
+          tilePadding: EdgeInsets.zero,
+          title: Text(
+            title,
+            style: TextUtil(context)
+                .plusJakarta(fontSize: 12, fontWeight: FontWeight.w600),
+          ),
+          children: [
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                body,
+                style: const TextStyle(fontSize: 11, fontFamily: 'monospace'),
               ),
             ),
           ],

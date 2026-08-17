@@ -32,12 +32,17 @@ class ReceiptScanModel {
   /// Full OCR output, kept so the user can check what the scanner actually read.
   final String rawText;
 
+  /// Stage-by-stage trace of how this result was reached, from the photo to the
+  /// chosen total. Shown on the review screen for diagnosing a bad scan.
+  final List<String> log;
+
   const ReceiptScanModel({
     required this.note,
     required this.price,
     required this.date,
     required this.items,
     required this.rawText,
+    this.log = const [],
   });
 
   /// True when nothing useful was extracted, so the UI can say "scan failed"
