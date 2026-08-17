@@ -31,6 +31,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int ddlMonth = DateTime.now().month;
   int ddlYear = DateTime.now().year;
+  String ddlSubCategoryId = "";
 
   @override
   void initState() {
@@ -142,15 +143,15 @@ class _HomePageState extends State<HomePage> {
                 FilterWidget(
                   ddlMonth: ddlMonth,
                   ddlYear: ddlYear,
-                  onDdlChanged:
-                      (month, year, ddlSubCategory, ddlSubCategoryId) {
+                  ddlSubCategoryId: ddlSubCategoryId,
+                  onDdlChanged: (month, year, subCategory, subCategoryId) {
                     context
                         .read<ExpenseBloc>()
-                        .add(GetExpenseEvent(month, year, ddlSubCategoryId));
+                        .add(GetExpenseEvent(month, year, subCategoryId));
                     setState(() {
                       ddlMonth = month;
                       ddlYear = year;
-                      ddlSubCategory = ddlSubCategory;
+                      ddlSubCategoryId = subCategoryId;
                     });
                   },
                 ),

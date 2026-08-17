@@ -2,6 +2,7 @@ import 'package:core/data/network/request/insert_expense_request.dart';
 import 'package:core/data/network/request/update_expense_request.dart';
 import 'package:core/domain/model/category_model.dart';
 import 'package:core/domain/model/expense_category_model.dart';
+import 'package:core/domain/model/expense_template_model.dart';
 import 'package:core/domain/model/receipt_scan_model.dart';
 import 'package:core/domain/model/sub_category_model.dart';
 import 'package:flutter/foundation.dart';
@@ -15,6 +16,8 @@ import 'package:group_expense_tracker/presentation/bloc/subcategory/subcategory_
 import 'package:group_expense_tracker/presentation/page/expense_form/widget/add_category_dialog.dart';
 import 'package:group_expense_tracker/presentation/page/expense_form/widget/add_subcategory_dialog.dart';
 import 'package:group_expense_tracker/presentation/page/expense_form/widget/date_picker_widget.dart';
+import 'package:group_expense_tracker/presentation/page/expense_form/widget/pick_template_sheet.dart';
+import 'package:group_expense_tracker/presentation/page/expense_template/expense_template_page.dart';
 import 'package:group_expense_tracker/presentation/widget/text_form_field.dart';
 import 'package:group_expense_tracker/util/ext/date_format_util.dart';
 import 'package:group_expense_tracker/util/ext/int_util.dart';
@@ -64,6 +67,13 @@ class _ExpenseRow {
 
   bool get hasCategory => (category?.categoryId ?? "").isNotEmpty;
   bool get hasSubCategory => (subCategory?.subCategoryId ?? "").isNotEmpty;
+
+  /// Nothing entered anywhere, so the row can be dropped without losing work.
+  bool get isBlank =>
+      note.text.trim().isEmpty &&
+      price.text.trim().isEmpty &&
+      !hasCategory &&
+      !hasSubCategory;
 
   void dispose() {
     note.dispose();
@@ -164,6 +174,54 @@ class _ExpenseFormPageState extends State<ExpenseFormPage> {
     setState(() => _rows.removeAt(index).dispose());
   }
 
+  /// Fills the form from the templates the user picked, one row each.
+  ///
+  /// Editing an existing expense overwrites the single row instead of adding
+  /// more, since one record cannot become several.
+  Future<void> _fillFromTemplates() async {
+    final templates = await pickExpenseTemplates(context);
+    if (templates == null || templates.isEmpty || !mounted) return;
+
+    setState(() {
+      if (isFromEdit) {
+        _applyTemplate(_rows.first, templates.first);
+        return;
+      }
+
+      // A row the user has already typed into is kept: the templates are added
+      // after it rather than replacing what is there. Untouched blank rows are
+      // dropped so picking one template does not leave an empty row behind.
+      final blanks = _rows.where((row) => row.isBlank).toList();
+      for (final row in blanks) {
+        _rows.remove(row);
+        row.dispose();
+      }
+
+      for (final template in templates) {
+        final row = _ExpenseRow();
+        _applyTemplate(row, template);
+        _rows.add(row);
+      }
+    });
+  }
+
+  void _applyTemplate(_ExpenseRow row, ExpenseTemplateModel template) {
+    row.note.text = template.note;
+    // A template without a price leaves the field empty for the user to fill,
+    // rather than writing a zero they would have to clear first.
+    row.price.text = template.price > 0 ? formatter.format(template.price) : "";
+    row.category = CategoryModel(
+      categoryId: template.categoryId,
+      categoryName: template.categoryName,
+      categoryColor: template.categoryColor,
+    );
+    row.subCategory = SubCategoryModel(
+      subCategoryId: template.subCategoryId,
+      subCategoryName: template.subCategoryName,
+      subCategoryColor: template.subCategoryColor,
+    );
+  }
+
   int get _rowsTotal =>
       _rows.fold(0, (sum, row) => sum + row.price.text.fromRupiah());
 
@@ -193,6 +251,14 @@ class _ExpenseFormPageState extends State<ExpenseFormPage> {
             appBar: AppBar(
               title: const Text("Form"),
               backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+              actions: [
+                IconButton(
+                  tooltip: "Manage templates",
+                  icon: const Icon(Icons.bookmarks_outlined),
+                  onPressed: () => Navigator.pushNamed(
+                      context, ExpenseTemplatePage.routeName),
+                ),
+              ],
             ),
             body: SafeArea(
               child: MultiBlocListener(
@@ -238,6 +304,7 @@ class _ExpenseFormPageState extends State<ExpenseFormPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               addDate(context),
+                              fillFromTemplate(context),
                               addLookups(context),
                               itemsSection(context),
                             ],
@@ -530,6 +597,24 @@ class _ExpenseFormPageState extends State<ExpenseFormPage> {
           : null,
       // Keeps the running total in step with what is typed.
       onChanged: (_) => setState(() {}),
+    );
+  }
+
+  /// Fills the rows from the templates the user saved, for the items entered
+  /// day after day. Sits above the lookup buttons because it is the quicker
+  /// path: it fills a whole row rather than only offering a dropdown value.
+  Widget fillFromTemplate(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 16),
+      child: SizedBox(
+        width: double.infinity,
+        child: OutlinedButton.icon(
+          onPressed: _fillFromTemplates,
+          icon: const Icon(Icons.bookmark_border),
+          label:
+              Text(isFromEdit ? "Replace from template" : "Fill from template"),
+        ),
+      ),
     );
   }
 

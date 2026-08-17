@@ -1,5 +1,6 @@
 import 'package:core/data/pref/auth_pref.dart';
 import 'package:core/data/pref/budget_pref.dart';
+import 'package:core/data/pref/expense_template_pref.dart';
 import 'package:core/util/poultry_registery.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -13,6 +14,8 @@ Future<void> init() async {
     PoultryRegistry.safeRegisterSingleton<AuthPref>(AuthPref(prefs: locator()));
     PoultryRegistry.safeRegisterSingleton<BudgetPref>(
         BudgetPref(prefs: locator()));
+    PoultryRegistry.safeRegisterSingleton<ExpenseTemplatePref>(
+        ExpenseTemplatePref(prefs: locator()));
   } catch (e) {
     debugPrint(e.toString());
   }

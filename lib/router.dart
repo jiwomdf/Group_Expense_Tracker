@@ -2,6 +2,7 @@ import 'package:core/domain/model/expense_category_model.dart';
 import 'package:flutter/material.dart';
 import 'package:group_expense_tracker/presentation/page/budget/budget_page.dart';
 import 'package:group_expense_tracker/presentation/page/expense_form/expense_form_page.dart';
+import 'package:group_expense_tracker/presentation/page/expense_template/expense_template_page.dart';
 import 'package:group_expense_tracker/presentation/page/export_expense/export_expense_json_page.dart';
 import 'package:group_expense_tracker/presentation/page/export_expense/export_expense_page.dart';
 import 'package:group_expense_tracker/presentation/page/export_expense/export_expense_sheet_page.dart';
@@ -32,6 +33,8 @@ PageRoute router(RouteSettings settings) {
       return MaterialPageRoute(builder: (_) => const UpdateTablePage());
     case BudgetPage.routeName:
       return MaterialPageRoute(builder: (_) => const BudgetPage());
+    case ExpenseTemplatePage.routeName:
+      return MaterialPageRoute(builder: (_) => const ExpenseTemplatePage());
     case SettingFirebasePage.routeName:
       return MaterialPageRoute(builder: (_) => const SettingFirebasePage());
     case ExpenseFormPage.routeName:

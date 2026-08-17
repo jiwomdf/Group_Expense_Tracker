@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:group_expense_tracker/app/apps/app_home.dart';
 import 'package:group_expense_tracker/app/apps/app_setting.dart';
@@ -8,6 +9,13 @@ import 'package:group_expense_tracker/app/init_firebase.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // Optional, the firebase options form simply stays empty when there is no
+  // `.env` file bundled with the build, or when the file is empty.
+  try {
+    await dotenv.load(fileName: ".env", isOptional: true);
+  } catch (_) {
+    dotenv.testLoad();
+  }
   await initAppSettingModule();
   //FcmBackgroundHandler().init();
 

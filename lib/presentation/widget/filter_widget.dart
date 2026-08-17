@@ -1,26 +1,30 @@
 import 'package:core/domain/model/sub_category_model.dart';
-import 'package:core/util/extension/color_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:group_expense_tracker/presentation/bloc/subcategory/subcategory_bloc.dart';
 import 'package:group_expense_tracker/presentation/widget/devider.dart';
 import 'package:group_expense_tracker/util/ext/date_util.dart';
 import 'package:group_expense_tracker/util/ext/int_util.dart';
-import 'package:group_expense_tracker/util/ext/string_util.dart';
 import 'package:group_expense_tracker/util/style/app_snackbar_util.dart';
 
+/// The dashboard owns the selected month, year and subcategory; this widget only
+/// renders them and reports changes back. Keeping a second copy here meant the
+/// dropdowns fell back to the current month whenever the dashboard rebuilt its
+/// children, so they stopped matching the data on screen.
 class FilterWidget extends StatefulWidget {
   static const String _defaultSubCategory = "All Category";
-  static const String _defaultSubCategoryId = "ALL_CATEGORY_ID";
+  static const String defaultSubCategoryId = "ALL_CATEGORY_ID";
 
   final int ddlMonth;
   final int ddlYear;
+  final String ddlSubCategoryId;
   final Function onDdlChanged;
 
   const FilterWidget(
       {super.key,
       required this.ddlMonth,
       required this.ddlYear,
+      this.ddlSubCategoryId = "",
       required this.onDdlChanged});
 
   @override
@@ -28,36 +32,39 @@ class FilterWidget extends StatefulWidget {
 }
 
 class _FilterWidgetState extends State<FilterWidget> {
-  String _ddlMonthStrValue = '';
-  int _ddlMonthValue = 1;
-  int _ddlYearValue = DateTime.now().year;
-
-  final SubCategoryModel _ddlSubCategoryValue = SubCategoryModel(
-    subCategoryId: FilterWidget._defaultSubCategoryId,
-    subCategoryColor: 0xff443a49,
-    subCategoryName: FilterWidget._defaultSubCategory,
-  );
-
-  List<int> _listYear = [];
   final List<SubCategoryModel> _subCategoryList = [];
 
-  @override
-  void initState() {
-    super.initState();
+  int get _month =>
+      widget.ddlMonth == 0 ? DateTime.now().month : widget.ddlMonth;
 
-    _listYear = generateLastFiveYear();
-    var month = DateTime.now().month;
+  int get _year => widget.ddlYear == 0 ? DateTime.now().year : widget.ddlYear;
 
-    if (widget.ddlMonth != 0) {
-      _ddlMonthValue = widget.ddlMonth;
-      _ddlMonthStrValue = ddMonths[month - 1].keys.first;
-      _ddlYearValue = widget.ddlYear;
-      return;
+  String get _subCategoryId => widget.ddlSubCategoryId.isEmpty
+      ? FilterWidget.defaultSubCategoryId
+      : widget.ddlSubCategoryId;
+
+  /// The year picker offers the last five years, but a filter can be restored
+  /// with an older one, and a dropdown whose value is missing from its items
+  /// throws.
+  List<int> get _listYear {
+    final years = generateLastFiveYear();
+    if (!years.contains(_year)) {
+      years
+        ..add(_year)
+        ..sort((a, b) => b.compareTo(a));
     }
-
-    _ddlMonthStrValue = ddMonths[month - 1].keys.first;
-    _ddlMonthValue = month;
+    return years;
   }
+
+  SubCategoryModel get _defaultSubCategory => SubCategoryModel(
+        subCategoryId: FilterWidget.defaultSubCategoryId,
+        subCategoryColor: 0xff443a49,
+        subCategoryName: FilterWidget._defaultSubCategory,
+      );
+
+  SubCategoryModel get _selectedSubCategory => _subCategoryList.firstWhere(
+      (itm) => itm.subCategoryId == _subCategoryId,
+      orElse: () => _defaultSubCategory);
 
   @override
   Widget build(BuildContext context) {
@@ -82,24 +89,14 @@ class _FilterWidgetState extends State<FilterWidget> {
         borderRadius: BorderRadius.circular(6),
         color: Theme.of(context).cardColor,
       ),
-      child: DropdownButton(
-        hint: Text(_ddlMonthStrValue),
+      child: DropdownButton<int>(
+        value: _month,
         items: ddMonths.map((Map<String, int> value) {
-          var monthStr = value.keys.first;
-          return DropdownMenuItem(value: value, child: Text(monthStr));
+          return DropdownMenuItem(
+              value: value.values.first, child: Text(value.keys.first));
         }).toList(),
         onChanged: (value) {
-          var monthStr = value?.keys.first ?? "";
-          var monthVal = value?.values.first ?? 0;
-          setState(() {
-            _ddlMonthStrValue = monthStr;
-            _ddlMonthValue = monthVal;
-          });
-          _updateExpenseList(
-              monthVal,
-              _ddlYearValue,
-              _ddlSubCategoryValue.subCategoryName,
-              _ddlSubCategoryValue.subCategoryId);
+          _updateExpenseList(value ?? _month, _year);
         },
       ),
     );
@@ -112,21 +109,13 @@ class _FilterWidgetState extends State<FilterWidget> {
         borderRadius: BorderRadius.circular(6),
         color: Theme.of(context).cardColor,
       ),
-      child: DropdownButton(
-        hint: Text(_ddlYearValue.toString()),
+      child: DropdownButton<int>(
+        value: _year,
         items: _listYear.map((int value) {
           return DropdownMenuItem(value: value, child: Text(value.toString()));
         }).toList(),
         onChanged: (value) {
-          setState(() {
-            _ddlYearValue = value?.toInt() ?? DateTime.now().year;
-          });
-          _updateExpenseList(
-            _ddlMonthValue,
-            _ddlYearValue,
-            _ddlSubCategoryValue.subCategoryName,
-            _ddlSubCategoryValue.subCategoryId,
-          );
+          _updateExpenseList(_month, value ?? _year);
         },
       ),
     );
@@ -137,32 +126,21 @@ class _FilterWidgetState extends State<FilterWidget> {
       builder: (context, state) {
         if (state is SubcategoryHasData) {
           _subCategoryList.clear();
-          _subCategoryList.add(SubCategoryModel(
-            subCategoryId: FilterWidget._defaultSubCategoryId,
-            subCategoryColor: 0xff443a49,
-            subCategoryName: FilterWidget._defaultSubCategory,
-          ));
+          _subCategoryList.add(_defaultSubCategory);
           _subCategoryList.addAll(state.result);
         } else if (state is SubcategoryError) {
           context.show(state.message);
         }
 
-        return DropdownButton(
-          hint: Row(
-            children: [
-              SizedBox(
-                height: 15,
-                child: CircleAvatar(
-                    backgroundColor:
-                        _ddlSubCategoryValue.subCategoryColor.toColor()),
-              ),
-              Text(_ddlSubCategoryValue.subCategoryName
-                  .ifNullOrEmpty("SubCategory")),
-            ],
-          ),
-          items: _subCategoryList.map((SubCategoryModel value) {
+        final items = _subCategoryList.isEmpty
+            ? [_defaultSubCategory]
+            : _subCategoryList;
+
+        return DropdownButton<String>(
+          value: _selectedSubCategory.subCategoryId,
+          items: items.map((SubCategoryModel value) {
             return DropdownMenuItem(
-                value: value,
+                value: value.subCategoryId,
                 child: Row(
                   children: [
                     SizedBox(
@@ -176,33 +154,29 @@ class _FilterWidgetState extends State<FilterWidget> {
                 ));
           }).toList(),
           onChanged: (value) {
-            setState(() {
-              _ddlSubCategoryValue.subCategoryColor =
-                  value?.subCategoryColor ?? subCategoryDefaultColor;
-              _ddlSubCategoryValue.subCategoryName =
-                  value?.subCategoryName ?? "";
-              _ddlSubCategoryValue.subCategoryId = value?.subCategoryId ?? "";
-            });
-            _updateExpenseList(
-                _ddlMonthValue,
-                _ddlYearValue,
-                _ddlSubCategoryValue.subCategoryName,
-                _ddlSubCategoryValue.subCategoryId);
+            _updateExpenseList(_month, _year,
+                subCategoryId: value ?? FilterWidget.defaultSubCategoryId);
           },
         );
       },
     );
   }
 
-  void _updateExpenseList(
-      int month, int year, String subCategory, String subCategoryId) {
-    var selectedSubCategory = "";
-    var selectedSubCategoryId = "";
-    if (FilterWidget._defaultSubCategory != subCategory) {
-      selectedSubCategory = subCategory;
-      selectedSubCategoryId = subCategoryId;
-    }
+  void _updateExpenseList(int month, int year, {String? subCategoryId}) {
+    final selectedId = subCategoryId ?? _subCategoryId;
+    final selected = _subCategoryList.firstWhere(
+        (itm) => itm.subCategoryId == selectedId,
+        orElse: () => _defaultSubCategory);
+
+    // "All Category" is the absence of a filter, so it is reported as empty
+    // rather than as a subcategory the query could match on.
+    final isAllCategory = selected.subCategoryId ==
+        FilterWidget.defaultSubCategoryId;
+
     widget.onDdlChanged(
-        month, year, selectedSubCategory, selectedSubCategoryId);
+        month,
+        year,
+        isAllCategory ? "" : selected.subCategoryName,
+        isAllCategory ? "" : selected.subCategoryId);
   }
 }

@@ -5,6 +5,7 @@ import 'package:group_expense_tracker/presentation/bloc/budget/budget_bloc.dart'
 import 'package:group_expense_tracker/presentation/bloc/logout/logout_bloc.dart';
 import 'package:group_expense_tracker/presentation/bloc/usermodel/userdatamodel_bloc.dart';
 import 'package:group_expense_tracker/presentation/page/budget/budget_page.dart';
+import 'package:group_expense_tracker/presentation/page/expense_template/expense_template_page.dart';
 import 'package:group_expense_tracker/presentation/page/home/widget/profile_widget.dart';
 import 'package:group_expense_tracker/util/ext/text_util.dart';
 import 'package:group_expense_tracker/util/style/app_color_util.dart';
@@ -67,6 +68,8 @@ class _RightDrawerState extends State<RightDrawer> {
                     children: [
                       _heading("Budget"),
                       _budget(context),
+                      _heading("Quick Fill"),
+                      _expenseTemplate(context),
                       _heading("Data Management"),
                       _exportData(context),
                       _heading("Setting Firebase"),
@@ -153,6 +156,31 @@ class _RightDrawerState extends State<RightDrawer> {
                 child: Icon(Icons.savings_outlined),
               ),
               Text("Monthly Budget",
+                  style: TextUtil(context)
+                      .urbanist(fontSize: 16, fontWeight: FontWeight.w600)),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Padding _expenseTemplate(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10, top: 10, left: 10),
+      child: InkWell(
+        onTap: () =>
+            Navigator.pushNamed(context, ExpenseTemplatePage.routeName),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              const Padding(
+                padding: EdgeInsets.only(right: 4),
+                child: Icon(Icons.bookmarks_outlined),
+              ),
+              Text("Expense Templates",
                   style: TextUtil(context)
                       .urbanist(fontSize: 16, fontWeight: FontWeight.w600)),
             ],

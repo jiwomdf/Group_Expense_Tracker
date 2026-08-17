@@ -5,23 +5,28 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:group_expense_tracker/presentation/bloc/setting_firebase/setting_firebase_bloc.dart';
 import 'package:group_expense_tracker/presentation/widget/text_form_field.dart';
 import 'package:group_expense_tracker/util/ext/text_util.dart';
 import 'package:group_expense_tracker/util/platform_util.dart';
 
-/// Pre loaded data taken from the google-services.json of the
-/// `money-expanse-lidya-s` firebase project, so the user does not have to
-/// type every field manually.
+/// Pre loaded data read from the `.env` file, so the user does not have to
+/// type every field manually. Every field falls back to an empty string when
+/// the key is missing, the form is still fully editable.
 class _FirebaseOptionsPreload {
-  static const apiKey = "AIzaSyDbHjguTqUQTAcoe0Tv49lBDFSlh84wmJE";
-  static const androidAppId = "1:543633010470:android:0f1d7f9f97bb305537dbe7";
-  static const messagingSenderId = "543633010470";
-  static const projectId = "money-expanse-lidya-s";
-  static const storageBucket = "money-expanse-lidya-s.appspot.com";
-  static const authDomain = "money-expanse-lidya-s.firebaseapp.com";
-  static const packageName = "com.programmergabut.lidya_group_expan";
+  static String _env(String key) => dotenv.maybeGet(key) ?? '';
+
+  static String get apiKey => _env('FIREBASE_API_KEY');
+  static String get androidAppId => _env('FIREBASE_ANDROID_APP_ID');
+  static String get webAppId => _env('FIREBASE_WEB_APP_ID');
+  static String get measurementId => _env('FIREBASE_MEASUREMENT_ID');
+  static String get messagingSenderId => _env('FIREBASE_MESSAGING_SENDER_ID');
+  static String get projectId => _env('FIREBASE_PROJECT_ID');
+  static String get storageBucket => _env('FIREBASE_STORAGE_BUCKET');
+  static String get authDomain => _env('FIREBASE_AUTH_DOMAIN');
+  static String get iosBundleId => _env('FIREBASE_IOS_BUNDLE_ID');
 }
 
 class SettingFirebasePage extends StatefulWidget {
@@ -216,7 +221,7 @@ class _SettingFirebasePageState extends State<SettingFirebasePage> {
         _FirebaseOptionsPreload.messagingSenderId;
     projectIdController.text = _FirebaseOptionsPreload.projectId;
     storageBucketController.text = _FirebaseOptionsPreload.storageBucket;
-    iosBundleIdController.text = _FirebaseOptionsPreload.packageName;
+    iosBundleIdController.text = _FirebaseOptionsPreload.iosBundleId;
 
     return BlocBuilder<SettingFirebaseBloc, SettingFirebaseState>(
       builder: (context, state) {
@@ -336,6 +341,8 @@ class _SettingFirebasePageState extends State<SettingFirebasePage> {
     storageBucketController.text = _FirebaseOptionsPreload.storageBucket;
     messagingSenderIdController.text =
         _FirebaseOptionsPreload.messagingSenderId;
+    appIdController.text = _FirebaseOptionsPreload.webAppId;
+    measurementIdController.text = _FirebaseOptionsPreload.measurementId;
 
     return BlocBuilder<SettingFirebaseBloc, SettingFirebaseState>(
       builder: (context, state) {

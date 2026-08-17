@@ -3,6 +3,7 @@ import 'package:get_it/get_it.dart';
 import 'package:group_expense_tracker/presentation/bloc/budget/budget_bloc.dart';
 import 'package:group_expense_tracker/presentation/bloc/category/category_bloc.dart';
 import 'package:group_expense_tracker/presentation/bloc/expense/expense_bloc.dart';
+import 'package:group_expense_tracker/presentation/bloc/expense_template/expense_template_bloc.dart';
 import 'package:group_expense_tracker/presentation/bloc/fcm/fcm_bloc.dart';
 import 'package:group_expense_tracker/presentation/bloc/login/login_bloc.dart';
 import 'package:group_expense_tracker/presentation/bloc/logout/logout_bloc.dart';
@@ -27,4 +28,6 @@ Future<void> init() async {
       () => SubcategoryBloc(locator()));
   PoultryRegistry.safeRegisterSingleton<FcmBloc>(FcmBloc(locator()));
   PoultryRegistry.safeRegisterFactory<BudgetBloc>(() => BudgetBloc(locator()));
+  PoultryRegistry.safeRegisterFactory<ExpenseTemplateBloc>(
+      () => ExpenseTemplateBloc(locator()));
 }

@@ -40,7 +40,12 @@ class _BudgetPageState extends State<BudgetPage> {
     return BlocProvider(
       create: (_) => di.locator<BudgetBloc>()..add(const GetBudgetEvent()),
       child: Scaffold(
-        appBar: AppBar(title: const Text("Monthly Budget")),
+        appBar: AppBar(
+          title: const Text("Monthly Budget"),
+          // Matches the expense form, so the bar sits flush with the page
+          // instead of picking up material 3's tint from the seed colour.
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        ),
         body: SafeArea(
           child: BlocConsumer<BudgetBloc, BudgetState>(
             listener: (context, state) {
