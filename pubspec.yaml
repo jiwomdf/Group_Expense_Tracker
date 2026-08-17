@@ -62,7 +62,7 @@ flutter:
   assets:
     - assets/svg/
     - assets/icon/
-    - .env
+    - assets/env/
 
 flutter_intl:
   enabled: true

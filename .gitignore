@@ -1,7 +1,7 @@
 # Environment / secrets
+# Matches assets/env/.env too, the tracked template is assets/env/env.example
 .env
 .env.*
-!.env.example
 
 # Miscellaneous
 *.class

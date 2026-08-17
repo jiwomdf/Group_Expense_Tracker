@@ -12,7 +12,7 @@ void main() async {
   // Optional, the firebase options form simply stays empty when there is no
   // `.env` file bundled with the build, or when the file is empty.
   try {
-    await dotenv.load(fileName: ".env", isOptional: true);
+    await dotenv.load(fileName: "assets/env/.env", isOptional: true);
   } catch (_) {
     dotenv.testLoad();
   }
