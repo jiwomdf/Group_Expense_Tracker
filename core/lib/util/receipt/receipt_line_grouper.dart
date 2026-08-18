@@ -1,4 +1,5 @@
 import 'package:core/domain/model/receipt_ocr_line.dart';
+import 'package:core/domain/model/receipt_row.dart';
 
 /// Rebuilds the receipt's printed rows from positioned OCR lines.
 ///
@@ -16,9 +17,9 @@ class ReceiptLineGrouper {
 
   const ReceiptLineGrouper({this.overlapThreshold = 0.5});
 
-  /// Returns one string per printed row, top to bottom, each row's fragments
-  /// joined left to right.
-  List<String> group(List<ReceiptOcrLine> lines) {
+  /// Returns one row per printed line, top to bottom, each row's fragments
+  /// joined left to right and keeping their horizontal spans.
+  List<ReceiptRow> groupRows(List<ReceiptOcrLine> lines) {
     final ordered = [...lines]..sort((a, b) => a.centerY.compareTo(b.centerY));
     final rows = <List<ReceiptOcrLine>>[];
 
@@ -40,11 +41,13 @@ class ReceiptLineGrouper {
     }
 
     return rows
-        .map((row) => (row..sort((a, b) => a.left.compareTo(b.left)))
-            .map((line) => line.text.trim())
-            .where((text) => text.isNotEmpty)
-            .join(' '))
-        .where((text) => text.isNotEmpty)
+        .map((row) =>
+            ReceiptRow.fromLines(row..sort((a, b) => a.left.compareTo(b.left))))
+        .where((row) => row.text.isNotEmpty)
         .toList();
   }
+
+  /// The same grouping flattened to text, for callers with no use for geometry.
+  List<String> group(List<ReceiptOcrLine> lines) =>
+      groupRows(lines).map((row) => row.text).toList();
 }

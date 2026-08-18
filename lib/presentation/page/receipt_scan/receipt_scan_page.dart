@@ -1,10 +1,8 @@
-import 'package:core/domain/model/receipt_scan_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:group_expense_tracker/data/ocr/receipt_scanner.dart';
 import 'package:group_expense_tracker/presentation/bloc/receipt_scan/receipt_scan_bloc.dart';
-import 'package:group_expense_tracker/util/ext/date_format_util.dart';
-import 'package:group_expense_tracker/util/ext/int_util.dart';
+import 'package:group_expense_tracker/presentation/page/receipt_scan/receipt_review_view.dart';
 import 'package:group_expense_tracker/util/ext/text_util.dart';
 import 'package:group_expense_tracker/util/style/app_snackbar_util.dart';
 import 'package:image_picker/image_picker.dart';
@@ -46,9 +44,10 @@ class _ReceiptScanPageState extends State<ReceiptScanPage> {
     try {
       final image = await _picker.pickImage(
         source: source,
-        // Downscaling keeps OCR fast without losing the printed text.
-        maxWidth: 1600,
-        imageQuality: 90,
+        // Thermal print is thin and faint, so it is only downscaled as far as
+        // the engines still read it reliably.
+        maxWidth: 2400,
+        imageQuality: 95,
       );
       if (image == null) return;
 
@@ -78,7 +77,12 @@ class _ReceiptScanPageState extends State<ReceiptScanPage> {
               return switch (state) {
                 ReceiptScanLoading() => const _ScanningIndicator(),
                 ReceiptScanHasData(:final result, :final imagePath) =>
-                  _resultView(context, result, imagePath),
+                  ReceiptReviewView(
+                    result: result,
+                    imagePath: imagePath,
+                    onUse: (accepted) => Navigator.pop(context, accepted),
+                    onRescan: () => _bloc.add(const ResetReceiptScanEvent()),
+                  ),
                 _ => _sourcePicker(context),
               };
             },
@@ -139,142 +143,6 @@ class _ReceiptScanPageState extends State<ReceiptScanPage> {
                 label: Text(PlatformUtil.isWeb()
                     ? "Upload a receipt"
                     : "Choose from gallery"),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _resultView(
-      BuildContext context, ReceiptScanModel result, String imagePath) {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              // image_picker hands back a blob: URL on web and a file path on
-              // mobile, and Image.network reads both.
-              child: Image.network(
-                PlatformUtil.isWeb()
-                    ? imagePath
-                    : Uri.file(imagePath).toString(),
-                height: 180,
-                width: double.infinity,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => const SizedBox(height: 180),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 20, bottom: 4),
-              child: Text(
-                "What the scanner read",
-                style: TextUtil(context)
-                    .plusJakarta(fontSize: 16, fontWeight: FontWeight.w600),
-              ),
-            ),
-            Text(
-              "Check these before saving — you can still edit everything on the next screen.",
-              style: TextUtil(context)
-                  .plusJakarta(fontSize: 12, fontWeight: FontWeight.w500),
-            ),
-            _resultRow(
-                context, "Merchant", result.note.isEmpty ? null : result.note),
-            _resultRow(context, "Total",
-                result.price == null ? null : "Rp ${result.price?.toRupiah()}"),
-            _resultRow(
-                context,
-                "Items",
-                result.items.isEmpty
-                    ? "none readable, will be one expense"
-                    : "${result.items.length} found"
-                        "${result.itemsMatchTotal ? ", matching the total" : ""}"),
-            _resultRow(
-                context,
-                "Date",
-                result.date?.toDateString(DateFormatUtil.ddMMMyyyy) ??
-                    "not found, today will be used"),
-            _monospaceExpander(context, "Show full text", result.rawText),
-            _monospaceExpander(
-                context, "Show process log", result.log.join('\n')),
-            Padding(
-              padding: const EdgeInsets.only(top: 24),
-              child: SizedBox(
-                width: double.infinity,
-                child: OutlinedButton(
-                  onPressed: () => Navigator.pop(context, result),
-                  child: const Text("Use this"),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 12),
-              child: SizedBox(
-                width: double.infinity,
-                child: TextButton(
-                  onPressed: () => _bloc.add(const ResetReceiptScanEvent()),
-                  child: const Text("Scan again"),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  /// Both the raw OCR dump and the stage trace read like console output, so
-  /// they share one collapsed monospace panel.
-  Widget _monospaceExpander(BuildContext context, String title, String body) {
-    if (body.trim().isEmpty) return const SizedBox();
-
-    return Padding(
-      padding: const EdgeInsets.only(top: 8),
-      child: Theme(
-        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-        child: ExpansionTile(
-          tilePadding: EdgeInsets.zero,
-          title: Text(
-            title,
-            style: TextUtil(context)
-                .plusJakarta(fontSize: 12, fontWeight: FontWeight.w600),
-          ),
-          children: [
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                body,
-                style: const TextStyle(fontSize: 11, fontFamily: 'monospace'),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _resultRow(BuildContext context, String label, String? value) {
-    final missing = value == null;
-
-    return Padding(
-      padding: const EdgeInsets.only(top: 12),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(label,
-              style: TextUtil(context)
-                  .plusJakarta(fontSize: 14, fontWeight: FontWeight.w500)),
-          Flexible(
-            child: Text(
-              value ?? "not found",
-              textAlign: TextAlign.end,
-              style: TextUtil(context).plusJakarta(
-                fontSize: 14,
-                fontWeight: missing ? FontWeight.w400 : FontWeight.w600,
               ),
             ),
           ),

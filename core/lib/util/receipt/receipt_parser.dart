@@ -1,7 +1,9 @@
 import 'package:core/domain/model/receipt_ocr_line.dart';
+import 'package:core/domain/model/receipt_row.dart';
 import 'package:core/domain/model/receipt_scan_model.dart';
 import 'package:core/util/receipt/receipt_amount.dart';
 import 'package:core/util/receipt/receipt_date_reader.dart';
+import 'package:core/util/receipt/receipt_item_reader.dart';
 import 'package:core/util/receipt/receipt_keywords.dart';
 import 'package:core/util/receipt/receipt_line_grouper.dart';
 import 'package:core/util/receipt/receipt_scan_log.dart';
@@ -12,36 +14,44 @@ import 'package:core/util/receipt/receipt_scan_log.dart';
 /// rules are the part worth unit testing.
 ///
 /// The vocabulary lives in [ReceiptKeywords], money handling in [ReceiptAmount],
-/// dates in [ReceiptDateReader], and layout in [ReceiptLineGrouper]. This file
-/// is only the extraction rules that use them.
+/// dates in [ReceiptDateReader], layout in [ReceiptLineGrouper] and the item
+/// list in [ReceiptItemReader]. This file is only the extraction rules that use
+/// them.
 class ReceiptParser {
   final ReceiptLineGrouper _grouper;
   final ReceiptDateReader _dateReader;
+  final ReceiptItemReader _itemReader;
 
   const ReceiptParser({
     ReceiptLineGrouper grouper = const ReceiptLineGrouper(),
     ReceiptDateReader dateReader = const ReceiptDateReader(),
+    ReceiptItemReader itemReader = const ReceiptItemReader(),
   })  : _grouper = grouper,
-        _dateReader = dateReader;
+        _dateReader = dateReader,
+        _itemReader = itemReader;
 
-  /// Guards against a misread page turning into hundreds of form rows.
-  static const _maxLineItems = 40;
-
-  /// A quantity opening a line item, as in `2 New set of pedal arms` or
-  /// `2x Kopi`. Requires a letter after it, so a bare code like `1234567 9.000`
-  /// is left alone.
-  static final _leadingQuantity = RegExp(r'^\d+\s*[xX*]?\s+(?=[A-Za-z])');
+  /// Fragments the engine is this unsure of are noise more often than text.
+  /// Applied only when the engine reports a confidence at all.
+  static const _minConfidence = 0.4;
 
   /// Parses positioned OCR lines. Preferred over [parse]: knowing where text
-  /// sat lets a label and its amount be put back on one row even when the
-  /// engine reported them in separate blocks.
+  /// sat lets a label and its amount be put back on one row, and separates an
+  /// item's name from the price column.
   ReceiptScanModel parseLines(List<ReceiptOcrLine> lines,
       {ReceiptScanLog? log}) {
     final rawText = lines.map((line) => line.text).join('\n');
-    final rows = _grouper.group(lines);
 
+    final legible = lines
+        .where((line) => (line.confidence ?? 1) >= _minConfidence)
+        .toList();
+    if (legible.length < lines.length) {
+      log?.detail('${lines.length - legible.length} low-confidence lines '
+          'ignored');
+    }
+
+    final rows = _grouper.groupRows(legible);
     log?.stage('Group',
-        '${lines.length} OCR lines merged into ${rows.length} printed rows');
+        '${legible.length} OCR lines merged into ${rows.length} printed rows');
 
     return _parseRows(rows, rawText, log);
   }
@@ -52,6 +62,7 @@ class ReceiptParser {
         .split('\n')
         .map((line) => line.replaceAll(RegExp(r'\s+'), ' ').trim())
         .where((line) => line.isNotEmpty)
+        .map(ReceiptRow.new)
         .toList();
 
     log?.stage('Rows', '${rows.length} text rows, no geometry available');
@@ -60,20 +71,26 @@ class ReceiptParser {
   }
 
   ReceiptScanModel _parseRows(
-      List<String> rows, String rawText, ReceiptScanLog? log) {
-    final note = _findMerchant(rows);
+      List<ReceiptRow> rows, String rawText, ReceiptScanLog? log) {
+    final texts = rows.map((row) => row.text).toList();
+
+    final money = ReceiptMoneyFormat.detect(texts);
+    log?.stage('Money',
+        money.usesCents ? 'amounts printed with cents' : 'whole rupiah');
+
+    final note = _findMerchant(texts);
     log?.stage('Merchant', note.isEmpty ? 'not found' : '"$note"');
 
-    final price = _findTotal(rows, log);
+    final price = _findTotal(texts, money, log);
 
-    final date = _dateReader.read(rows);
+    final date = _dateReader.read(texts);
     log?.stage(
         'Date',
         date == null
             ? 'not printed, today will be used'
             : '${date.day}/${date.month}/${date.year}');
 
-    final items = _findLineItems(rows);
+    final items = _itemReader.read(rows, money: money, total: price, log: log);
     final itemsTotal = items.fold(0, (sum, item) => sum + item.price);
     log?.stage('Items', '${items.length} found, summing Rp $itemsTotal');
     if (items.isNotEmpty && price != null) {
@@ -94,7 +111,8 @@ class ReceiptParser {
 
   /// Walks the keyword tiers in order and, within a tier, prefers the lowest
   /// row on the receipt — the total is printed below the item list.
-  int? _findTotal(List<String> rows, [ReceiptScanLog? log]) {
+  int? _findTotal(
+      List<String> rows, ReceiptMoneyFormat money, ReceiptScanLog? log) {
     for (var tierIndex = 0;
         tierIndex < ReceiptKeywords.totalTiers.length;
         tierIndex++) {
@@ -112,8 +130,10 @@ class ReceiptParser {
 
         // The amount is usually on the label's row, but a layout the grouper
         // could not reunite can push it onto the next one.
-        final amount = ReceiptAmount.lastIn(rows[i]) ??
-            (i + 1 < rows.length ? ReceiptAmount.lastIn(rows[i + 1]) : null);
+        final amount = ReceiptAmount.lastIn(rows[i], money: money) ??
+            (i + 1 < rows.length
+                ? ReceiptAmount.lastIn(rows[i + 1], money: money)
+                : null);
 
         if (amount != null && amount >= ReceiptAmount.minPlausible) {
           log?.stage('Total', 'Rp $amount');
@@ -124,7 +144,7 @@ class ReceiptParser {
       }
     }
 
-    final largest = _largestAmountIn(rows);
+    final largest = _largestAmountIn(rows, money);
     log?.stage('Total', largest == null ? 'not found' : 'Rp $largest');
     log?.detail(largest == null
         ? 'no keyword matched and no money-shaped amount was present'
@@ -137,7 +157,7 @@ class ReceiptParser {
   ///
   /// Only tokens punctuated like money count, or a postcode or phone number
   /// wins instead.
-  int? _largestAmountIn(List<String> rows) {
+  int? _largestAmountIn(List<String> rows, ReceiptMoneyFormat money) {
     int? largest;
 
     for (final row in rows) {
@@ -149,64 +169,13 @@ class ReceiptParser {
         final token = match.group(1);
         if (token == null || !ReceiptAmount.looksLikeMoney(token)) continue;
 
-        final amount = ReceiptAmount.toRupiah(token);
+        final amount = money.toRupiah(token);
         if (amount == null || amount < ReceiptAmount.minPlausible) continue;
         if (largest == null || amount > largest) largest = amount;
       }
     }
 
     return largest;
-  }
-
-  /// Pulls out the purchased lines, so a receipt can become several expenses
-  /// instead of one lump sum.
-  ///
-  /// A row qualifies only when it holds a description *and* an amount. With
-  /// geometry the grouper will already have reunited a description with the
-  /// amount printed opposite it; without it, such a pair stays unusable.
-  List<ReceiptLineItem> _findLineItems(List<String> rows) {
-    final items = <ReceiptLineItem>[];
-
-    for (final row in rows) {
-      if (items.length >= _maxLineItems) break;
-
-      final lower = row.toLowerCase();
-      if (ReceiptKeywords.itemExclusions.any(lower.contains)) continue;
-
-      // A leading quantity is dropped first. Left in place it would be read as
-      // the row's own first amount, so `2 New set of pedal arms 15.00 30.00`
-      // would end up with an empty description.
-      final item = row.replaceFirst(_leadingQuantity, '');
-
-      final matches = ReceiptAmount.pattern.allMatches(item).toList();
-      if (matches.isEmpty) continue;
-
-      // The rightmost figure is the line total; anything before it is a unit
-      // price or quantity.
-      final price = ReceiptAmount.toRupiah(matches.last.group(1));
-      if (price == null || price < ReceiptAmount.minPlausible) continue;
-
-      final note = _describeItem(item, matches.first.start);
-      if (note.isEmpty) continue;
-
-      items.add(ReceiptLineItem(note: note, price: price));
-    }
-
-    return items;
-  }
-
-  /// The description is the text before the first figure, minus any leading
-  /// quantity.
-  String _describeItem(String row, int firstAmountStart) {
-    var description = row.substring(0, firstAmountStart).trim();
-    description = description.replaceFirst(RegExp(r'^\d+\s*[xX*]?\s*'), '');
-    description = description.replaceAll(RegExp(r'\s*[.:\-]+$'), '').trim();
-
-    // Needs real words, otherwise it is leftover punctuation or a code.
-    final letters = description.replaceAll(RegExp(r'[^a-zA-Z]'), '').length;
-    if (letters < 3) return '';
-
-    return description;
   }
 
   /// The merchant name is nearly always in the first few rows, above the

@@ -52,6 +52,36 @@ class ReceiptScanModel {
   /// Sum of the parsed lines, for comparing against [price].
   int get itemsTotal => items.fold(0, (sum, item) => sum + item.price);
 
+  ReceiptScanModel copyWith({
+    String? note,
+    int? price,
+    DateTime? date,
+    List<ReceiptLineItem>? items,
+  }) =>
+      ReceiptScanModel(
+        note: note ?? this.note,
+        price: price ?? this.price,
+        date: date ?? this.date,
+        items: items ?? this.items,
+        rawText: rawText,
+        log: log,
+      );
+
+  /// The same scan reduced to its total, with the line items and the merchant
+  /// name dropped.
+  ///
+  /// Used when the user chooses to book the receipt as a single unnamed
+  /// expense: the name is left empty so the form asks them for one instead of
+  /// pre-filling a merchant they did not ask for.
+  ReceiptScanModel get totalOnly => ReceiptScanModel(
+        note: "",
+        price: price ?? (items.isEmpty ? null : itemsTotal),
+        date: date,
+        items: const [],
+        rawText: rawText,
+        log: log,
+      );
+
   /// True when the parsed lines add up to the printed total, which means the
   /// item list is very likely complete and correct.
   ///
